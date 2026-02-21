@@ -148,6 +148,9 @@
     }
   });
 
+  const previewArea = document.getElementById('ps-preview');
+  let activePreviewIdx = -1;
+
   // --- 結果アイテム表示 ---
   function appendResultItem(name, pageCount, size, index) {
     const item = document.createElement('div');
@@ -157,12 +160,22 @@
         '<div class="result-item-name">' + escapeHTML(name) + '</div>' +
         '<div class="result-item-meta">' + pageCount + ' ページ / ' + ChoiTool.formatFileSize(size) + '</div>' +
       '</div>' +
-      '<button class="btn btn-sm btn-secondary" data-idx="' + index + '">DL</button>';
+      '<button class="btn btn-sm btn-secondary ps-preview-btn">プレビュー</button>' +
+      '<button class="btn btn-sm btn-secondary ps-dl-btn">DL</button>';
     resultList.appendChild(item);
 
-    item.querySelector('button').addEventListener('click', () => {
-      const r = results[index];
-      ChoiTool.downloadBlob(r.blob, r.name);
+    item.querySelector('.ps-dl-btn').addEventListener('click', () => {
+      ChoiTool.downloadBlob(results[index].blob, results[index].name);
+    });
+
+    item.querySelector('.ps-preview-btn').addEventListener('click', () => {
+      if (activePreviewIdx === index) {
+        previewArea.style.display = 'none';
+        activePreviewIdx = -1;
+        return;
+      }
+      activePreviewIdx = index;
+      ChoiTool.renderPdfPreview(results[index].blob, previewArea);
     });
   }
 

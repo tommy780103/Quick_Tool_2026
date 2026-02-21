@@ -234,6 +234,58 @@ const ChoiTool = {
   },
 
   /**
+   * PDFをプレビュー描画（PDF.js使用）
+   * @param {Blob} blob - PDFデータ
+   * @param {HTMLElement|string} container - 描画先要素またはそのID
+   * @param {number} maxPages - 最大描画ページ数
+   * @returns {Promise<void>}
+   */
+  async renderPdfPreview(blob, container, maxPages) {
+    if (typeof container === 'string') container = document.getElementById(container);
+    if (!container) return;
+    maxPages = maxPages || 20;
+    container.innerHTML = '';
+    container.style.display = '';
+
+    var arrayBuffer = await this.readFileAs(blob, 'arrayBuffer');
+    var pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    var pagesToRender = Math.min(pdf.numPages, maxPages);
+
+    for (var i = 1; i <= pagesToRender; i++) {
+      var page = await pdf.getPage(i);
+      var vp = page.getViewport({ scale: 1 });
+
+      // コンテナ幅に合わせてスケール（padding分を考慮）
+      var containerWidth = container.clientWidth - 32 || 600;
+      var scale = Math.min(containerWidth / vp.width, 1.5);
+      var scaledVp = page.getViewport({ scale: scale });
+
+      var wrapper = document.createElement('div');
+      wrapper.className = 'pdf-preview-page';
+
+      var canvas = document.createElement('canvas');
+      canvas.width = scaledVp.width;
+      canvas.height = scaledVp.height;
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport: scaledVp }).promise;
+
+      var label = document.createElement('div');
+      label.className = 'pdf-preview-label';
+      label.textContent = i + ' / ' + pdf.numPages;
+
+      wrapper.appendChild(canvas);
+      wrapper.appendChild(label);
+      container.appendChild(wrapper);
+    }
+
+    if (pdf.numPages > maxPages) {
+      var more = document.createElement('div');
+      more.className = 'pdf-preview-more';
+      more.textContent = '... 他 ' + (pdf.numPages - maxPages) + ' ページ';
+      container.appendChild(more);
+    }
+  },
+
+  /**
    * 高品質ステップダウンリサイズ
    * @param {HTMLImageElement} img
    * @param {number} targetW

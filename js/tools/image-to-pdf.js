@@ -163,6 +163,7 @@
 
       resultInfo.textContent = pdfDoc.getPageCount() + ' ページ / ' + ChoiTool.formatFileSize(resultBlob.size);
       resultArea.style.display = '';
+      ChoiTool.renderPdfPreview(resultBlob, 'i2p-preview');
       ChoiTool.showToast('画像をPDFに変換しました', 'success');
     } catch (e) {
       ChoiTool.showToast('画像→PDF変換に失敗しました: ' + e.message, 'error');

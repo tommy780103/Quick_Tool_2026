@@ -296,6 +296,7 @@
       const totalPages = mergedPdf.getPageCount();
       resultInfo.textContent = totalPages + ' ページ / ' + ChoiTool.formatFileSize(resultBlob.size);
       resultArea.style.display = '';
+      ChoiTool.renderPdfPreview(resultBlob, 'pm-preview');
       ChoiTool.showToast('ファイルを結合しました', 'success');
     } catch (e) {
       ChoiTool.showToast('結合に失敗しました: ' + e.message, 'error');
