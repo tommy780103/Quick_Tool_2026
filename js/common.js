@@ -234,6 +234,84 @@ const ChoiTool = {
   },
 
   /**
+   * 高品質ステップダウンリサイズ
+   * @param {HTMLImageElement} img
+   * @param {number} targetW
+   * @param {number} targetH
+   * @returns {HTMLCanvasElement}
+   */
+  stepDownResize(img, targetW, targetH) {
+    let currentW = img.naturalWidth;
+    let currentH = img.naturalHeight;
+    let src = document.createElement('canvas');
+    src.width = currentW;
+    src.height = currentH;
+    src.getContext('2d').drawImage(img, 0, 0);
+
+    while (currentW / 2 > targetW && currentH / 2 > targetH) {
+      const halfW = Math.round(currentW / 2);
+      const halfH = Math.round(currentH / 2);
+      const tmp = document.createElement('canvas');
+      tmp.width = halfW;
+      tmp.height = halfH;
+      tmp.getContext('2d').drawImage(src, 0, 0, halfW, halfH);
+      src = tmp;
+      currentW = halfW;
+      currentH = halfH;
+    }
+
+    if (currentW !== targetW || currentH !== targetH) {
+      const fin = document.createElement('canvas');
+      fin.width = targetW;
+      fin.height = targetH;
+      fin.getContext('2d').drawImage(src, 0, 0, targetW, targetH);
+      return fin;
+    }
+    return src;
+  },
+
+  /**
+   * 画像プレビューモーダルを表示
+   * @param {string} src - 画像URL（blob: or data:）
+   */
+  showImagePreview(src) {
+    const existing = document.getElementById('choi-img-preview');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'choi-img-preview';
+    overlay.className = 'img-preview-overlay';
+
+    const backdrop = document.createElement('div');
+    backdrop.className = 'img-preview-backdrop';
+
+    const body = document.createElement('div');
+    body.className = 'img-preview-body';
+
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'img-preview-close';
+    closeBtn.textContent = '\u00d7';
+
+    const img = document.createElement('img');
+    img.className = 'img-preview-img';
+    img.src = src;
+
+    body.appendChild(closeBtn);
+    body.appendChild(img);
+    overlay.appendChild(backdrop);
+    overlay.appendChild(body);
+    document.body.appendChild(overlay);
+
+    function close() { overlay.remove(); }
+    backdrop.addEventListener('click', close);
+    closeBtn.addEventListener('click', close);
+    const handler = function (e) {
+      if (e.key === 'Escape') { close(); document.removeEventListener('keydown', handler); }
+    };
+    document.addEventListener('keydown', handler);
+  },
+
+  /**
    * ドラッグで並べ替え可能なリストを初期化
    * @param {string} containerId
    * @param {Function} onReorder - (newOrder: number[]) => void
