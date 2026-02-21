@@ -143,11 +143,10 @@
     var FONT_SIZE = 9 * SCALE;
     var BOLD_FONT = 'bold ' + FONT_SIZE + 'px ' + FONT;
     var NORMAL_FONT = FONT_SIZE + 'px ' + FONT;
-    var TITLE_FONT = 'bold ' + (11 * SCALE) + 'px ' + FONT;
     var PAD = 5 * SCALE;
     var ROW_H = FONT_SIZE + PAD * 2;
     var HDR_H = FONT_SIZE + PAD * 2 + 2 * SCALE;
-    var TITLE_H = 22 * SCALE;
+    var TITLE_H = 0;
     var W = contentW * SCALE;
     var H = contentH * SCALE;
 
@@ -193,12 +192,6 @@
       // 背景
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, tableW, canvasH);
-
-      // シート名
-      ctx.fillStyle = '#323130';
-      ctx.font = TITLE_FONT;
-      ctx.textBaseline = 'middle';
-      ctx.fillText(sheetName + (p > 0 ? ' (続き)' : ''), PAD, TITLE_H / 2);
 
       var y = TITLE_H;
 
