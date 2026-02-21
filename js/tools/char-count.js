@@ -9,9 +9,13 @@
   var noSpaceEl = document.getElementById('cc-no-space');
   var fullwidthEl = document.getElementById('cc-fullwidth');
   var halfwidthEl = document.getElementById('cc-halfwidth');
+  var hiraganaEl = document.getElementById('cc-hiragana');
+  var katakanaEl = document.getElementById('cc-katakana');
+  var kanjiEl = document.getElementById('cc-kanji');
   var linesEl = document.getElementById('cc-lines');
   var bytesEl = document.getElementById('cc-bytes');
   var wordsEl = document.getElementById('cc-words');
+  var morphemesEl = document.getElementById('cc-morphemes');
   var paragraphsEl = document.getElementById('cc-paragraphs');
   var visualEl = document.getElementById('cc-visual');
   var visualTitle = document.getElementById('cc-visual-title');
@@ -22,9 +26,65 @@
 
   var activeMode = null;
 
+  // --- 文字種判定 ---
+
   function isFullwidth(code) {
     return code > 255;
   }
+
+  function isHiragana(code) {
+    return code >= 0x3040 && code <= 0x309F;
+  }
+
+  function isKatakana(code) {
+    return (code >= 0x30A0 && code <= 0x30FF) ||
+           (code >= 0xFF65 && code <= 0xFF9F);
+  }
+
+  function isKanji(code) {
+    return (code >= 0x4E00 && code <= 0x9FFF) ||
+           (code >= 0x3400 && code <= 0x4DBF) ||
+           (code >= 0xF900 && code <= 0xFAFF);
+  }
+
+  // --- 形態素解析（Intl.Segmenter） ---
+
+  var segmenter = null;
+  try {
+    if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+      segmenter = new Intl.Segmenter('ja', { granularity: 'word' });
+    }
+  } catch (e) { /* not available */ }
+
+  function getMorphemeSegments(text) {
+    if (!text) return [];
+    if (!segmenter) {
+      // フォールバック: 簡易分割
+      return splitWords(text).map(function (s) {
+        return { segment: s.text, isWordLike: s.type === 'word' };
+      });
+    }
+    var result = [];
+    var segs = segmenter.segment(text);
+    var iter = segs[Symbol.iterator]();
+    var item = iter.next();
+    while (!item.done) {
+      result.push({ segment: item.value.segment, isWordLike: item.value.isWordLike });
+      item = iter.next();
+    }
+    return result;
+  }
+
+  function countMorphemes(text) {
+    var segs = getMorphemeSegments(text);
+    var count = 0;
+    for (var i = 0; i < segs.length; i++) {
+      if (segs[i].isWordLike) count++;
+    }
+    return count;
+  }
+
+  // --- カウント関数 ---
 
   function countWords(text) {
     if (!text) return 0;
@@ -74,9 +134,13 @@
       noSpaceEl.textContent = '0';
       fullwidthEl.textContent = '0';
       halfwidthEl.textContent = '0';
+      hiraganaEl.textContent = '0';
+      katakanaEl.textContent = '0';
+      kanjiEl.textContent = '0';
       linesEl.textContent = '0';
       bytesEl.textContent = '0';
       wordsEl.textContent = '0';
+      morphemesEl.textContent = '0';
       paragraphsEl.textContent = '0';
       if (activeMode) renderVisual(activeMode);
       return;
@@ -86,27 +150,39 @@
     var noSpace = text.replace(/\s/g, '').length;
     var fullwidth = 0;
     var halfwidth = 0;
+    var hiragana = 0;
+    var katakana = 0;
+    var kanji = 0;
 
     for (var i = 0; i < text.length; i++) {
-      if (isFullwidth(text.charCodeAt(i))) {
+      var code = text.charCodeAt(i);
+      if (isFullwidth(code)) {
         fullwidth++;
       } else {
         halfwidth++;
       }
+      if (isHiragana(code)) hiragana++;
+      if (isKatakana(code)) katakana++;
+      if (isKanji(code)) kanji++;
     }
 
     var lines = text.split('\n').length;
     var bytes = new Blob([text]).size;
     var words = countWords(text);
+    var morphemes = countMorphemes(text);
     var paragraphs = countParagraphs(text);
 
     totalEl.textContent = total.toLocaleString();
     noSpaceEl.textContent = noSpace.toLocaleString();
     fullwidthEl.textContent = fullwidth.toLocaleString();
     halfwidthEl.textContent = halfwidth.toLocaleString();
+    hiraganaEl.textContent = hiragana.toLocaleString();
+    katakanaEl.textContent = katakana.toLocaleString();
+    kanjiEl.textContent = kanji.toLocaleString();
     linesEl.textContent = lines.toLocaleString();
     bytesEl.textContent = bytes.toLocaleString();
     wordsEl.textContent = words.toLocaleString();
+    morphemesEl.textContent = morphemes.toLocaleString();
     paragraphsEl.textContent = paragraphs.toLocaleString();
 
     if (activeMode) renderVisual(activeMode);
@@ -142,6 +218,32 @@
       }
     }
     return segments;
+  }
+
+  /** 文字種ラベルを返す */
+  function charTypeLabel(code) {
+    if (isHiragana(code)) return 'ひらがな';
+    if (isKatakana(code)) return 'カタカナ';
+    if (isKanji(code)) return '漢字';
+    if (code >= 0xFF10 && code <= 0xFF19) return '全角数字';
+    if ((code >= 0xFF21 && code <= 0xFF3A) || (code >= 0xFF41 && code <= 0xFF5A)) return '全角英字';
+    if (code >= 0x30 && code <= 0x39) return '半角数字';
+    if ((code >= 0x41 && code <= 0x5A) || (code >= 0x61 && code <= 0x7A)) return '半角英字';
+    if (code > 255) return 'その他全角';
+    return 'その他半角';
+  }
+
+  /** 改行付きエスケープ */
+  function escapeWithNl(str) {
+    var html = '';
+    for (var j = 0; j < str.length; j++) {
+      if (str[j] === '\n') {
+        html += '<span class="cc-hl-newline">\u21B5</span>\n';
+      } else {
+        html += escapeHtml(str[j]);
+      }
+    }
+    return html;
   }
 
   var VISUALIZERS = {
@@ -220,6 +322,66 @@
         return html;
       }
     },
+    'hiragana': {
+      title: 'ひらがな',
+      legend: [
+        { label: 'ひらがな', color: '#c8e6c9' },
+        { label: 'その他', color: 'transparent' },
+      ],
+      render: function (text) {
+        var html = '';
+        for (var i = 0; i < text.length; i++) {
+          if (text[i] === '\n') {
+            html += '<span class="cc-hl-newline">\u21B5</span>\n';
+          } else if (isHiragana(text.charCodeAt(i))) {
+            html += '<span class="cc-hl-hiragana">' + escapeHtml(text[i]) + '</span>';
+          } else {
+            html += '<span style="opacity:.4">' + escapeHtml(text[i]) + '</span>';
+          }
+        }
+        return html;
+      }
+    },
+    'katakana': {
+      title: 'カタカナ',
+      legend: [
+        { label: 'カタカナ', color: '#bbdefb' },
+        { label: 'その他', color: 'transparent' },
+      ],
+      render: function (text) {
+        var html = '';
+        for (var i = 0; i < text.length; i++) {
+          if (text[i] === '\n') {
+            html += '<span class="cc-hl-newline">\u21B5</span>\n';
+          } else if (isKatakana(text.charCodeAt(i))) {
+            html += '<span class="cc-hl-katakana">' + escapeHtml(text[i]) + '</span>';
+          } else {
+            html += '<span style="opacity:.4">' + escapeHtml(text[i]) + '</span>';
+          }
+        }
+        return html;
+      }
+    },
+    'kanji': {
+      title: '漢字',
+      legend: [
+        { label: '漢字', color: '#ffe0b2' },
+        { label: 'その他', color: 'transparent' },
+      ],
+      render: function (text) {
+        var html = '';
+        for (var i = 0; i < text.length; i++) {
+          if (text[i] === '\n') {
+            html += '<span class="cc-hl-newline">\u21B5</span>\n';
+          } else if (isKanji(text.charCodeAt(i))) {
+            html += '<span class="cc-hl-kanji">' + escapeHtml(text[i]) + '</span>';
+          } else {
+            html += '<span style="opacity:.4">' + escapeHtml(text[i]) + '</span>';
+          }
+        }
+        return html;
+      }
+    },
     'lines': {
       title: '行数',
       legend: [
@@ -276,21 +438,43 @@
         var wordIdx = 0;
         for (var i = 0; i < segments.length; i++) {
           var seg = segments[i];
-          var escaped = '';
-          // 改行を可視化
-          for (var j = 0; j < seg.text.length; j++) {
-            if (seg.text[j] === '\n') {
-              escaped += '<span class="cc-hl-newline">\u21B5</span>\n';
-            } else {
-              escaped += escapeHtml(seg.text[j]);
-            }
-          }
+          var escaped = escapeWithNl(seg.text);
           if (seg.type === 'word') {
             var cls = (wordIdx % 2 === 0) ? 'cc-hl-word cc-hl-word-even' : 'cc-hl-word cc-hl-word-odd';
             html += '<span class="' + cls + '">' + escaped + '</span>';
             wordIdx++;
           } else {
             html += escaped;
+          }
+        }
+        return html;
+      }
+    },
+    'morphemes': {
+      title: '形態素数',
+      legend: [
+        { label: '形態素（交互色）', color: '#e1bee7' },
+        { label: '', color: '#ffe0b2' },
+        { label: '区切り', color: 'transparent' },
+      ],
+      render: function (text) {
+        var segs = getMorphemeSegments(text);
+        var html = '';
+        var wordIdx = 0;
+        for (var i = 0; i < segs.length; i++) {
+          var seg = segs[i];
+          var escaped = escapeWithNl(seg.segment);
+          if (seg.isWordLike) {
+            var cls = (wordIdx % 2 === 0) ? 'cc-hl-word cc-hl-para-even' : 'cc-hl-word cc-hl-para-odd';
+            var label = '';
+            if (seg.segment.length > 0) {
+              var code = seg.segment.charCodeAt(0);
+              label = charTypeLabel(code);
+            }
+            html += '<span class="' + cls + '" title="' + escapeHtml(label) + '">' + escaped + '</span>';
+            wordIdx++;
+          } else {
+            html += '<span style="opacity:.4">' + escaped + '</span>';
           }
         }
         return html;
@@ -319,15 +503,7 @@
             }
           } else if (block.trim()) {
             var cls = (paraIdx % 2 === 0) ? 'cc-hl-paragraph cc-hl-para-even' : 'cc-hl-paragraph cc-hl-para-odd';
-            var escaped = '';
-            for (var k = 0; k < block.length; k++) {
-              if (block[k] === '\n') {
-                escaped += '<span class="cc-hl-newline">\u21B5</span>\n';
-              } else {
-                escaped += escapeHtml(block[k]);
-              }
-            }
-            html += '<span class="' + cls + '">' + escaped + '</span>';
+            html += '<span class="' + cls + '">' + escapeWithNl(block) + '</span>';
             paraIdx++;
           } else {
             html += escapeHtml(block);

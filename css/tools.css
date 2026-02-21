@@ -157,6 +157,11 @@
 .cc-hl-para-even { background: #e1bee7; }
 .cc-hl-para-odd { background: #ffe0b2; }
 
+/* 文字種ハイライト */
+.cc-hl-hiragana { background: #c8e6c9; border-radius: 2px; }
+.cc-hl-katakana { background: #bbdefb; border-radius: 2px; }
+.cc-hl-kanji { background: #ffe0b2; border-radius: 2px; }
+
 /* バイト数の重み色 */
 .cc-hl-byte-1 { background: #c8e6c9; }
 .cc-hl-byte-2 { background: #fff9c4; }
