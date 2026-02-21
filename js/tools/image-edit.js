@@ -364,20 +364,35 @@
       var x1 = tempShape.x1, y1 = tempShape.y1;
       var x2 = tempShape.x2, y2 = tempShape.y2;
       var angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+      var stroke = tempShape.stroke;
       var sw = tempShape.strokeWidth || 2;
       var headSize = Math.max(10, sw * 3);
 
+      fc.remove(tempShape);
+
+      // グループ内ローカル座標で新規作成
+      var cx = (x1 + x2) / 2;
+      var cy = (y1 + y2) / 2;
+      var line = new fabric.Line([x1 - cx, y1 - cy, x2 - cx, y2 - cy], {
+        stroke: stroke, strokeWidth: sw,
+        selectable: false,
+        originX: 'center', originY: 'center',
+      });
+
       var arrowHead = new fabric.Triangle({
-        left: x2, top: y2,
+        left: x2 - cx, top: y2 - cy,
         width: headSize, height: headSize,
-        fill: tempShape.stroke,
+        fill: stroke,
         angle: angle + 90,
         originX: 'center', originY: 'center',
         selectable: false,
       });
 
-      fc.remove(tempShape);
-      var group = new fabric.Group([tempShape, arrowHead], { selectable: true });
+      var group = new fabric.Group([line, arrowHead], {
+        left: cx, top: cy,
+        originX: 'center', originY: 'center',
+        selectable: true,
+      });
       fc.add(group);
       fc.setActiveObject(group);
     } else {
@@ -532,16 +547,21 @@
     var textItem = items.find(function (o) { return o.type === 'i-text'; });
     if (!textItem) return;
 
-    var left = target.left;
-    var top = target.top;
     var isComment = target._isComment;
 
-    // グループ解除
+    // グループの中心座標（キャンバス絶対座標）を取得
+    var center = target.getCenterPoint();
+    var sx = target.scaleX || 1;
+    var sy = target.scaleY || 1;
+
+    // グループ解除 — 子要素の座標をグループ中心からの相対→キャンバス絶対に変換
     fc.remove(target);
     items.forEach(function (item) {
       item.set({
-        left: left + (item.left || 0),
-        top: top + (item.top || 0),
+        left: center.x + item.left * sx,
+        top: center.y + item.top * sy,
+        originX: 'center',
+        originY: 'center',
       });
       item.setCoords();
       fc.add(item);
@@ -564,24 +584,24 @@
         });
       }
 
-      // 位置を取得してから全アイテム削除
-      var newLeft = textItem.left - (textItem.width / 2);
-      var newTop = textItem.top - (textItem.height / 2);
-      if (rectItem) {
-        newLeft = Math.min(newLeft, rectItem.left);
-        newTop = Math.min(newTop, rectItem.top);
-      }
+      // テキストの現在位置を再グループ化の基準にする
+      var newCenterX = textItem.left;
+      var newCenterY = textItem.top;
 
+      // キャンバスから全アイテム削除
       items.forEach(function (item) { fc.remove(item); });
 
-      // origin をリセットして再グループ化
+      // グループ内ローカル座標(0,0)にリセットして再グループ化
       items.forEach(function (item) {
-        item.set({ left: 0, top: 0 });
+        item.set({ left: 0, top: 0, originX: 'center', originY: 'center' });
       });
-      textItem.set({ originX: 'center', originY: 'center', left: 0, top: 0 });
-      if (rectItem) rectItem.set({ originX: 'center', originY: 'center', left: 0, top: 0 });
 
-      var newGroup = new fabric.Group(items, { left: left, top: top });
+      var newGroup = new fabric.Group(items, {
+        left: newCenterX,
+        top: newCenterY,
+        originX: 'center',
+        originY: 'center',
+      });
       newGroup._isComment = isComment;
       fc.add(newGroup);
       fc.setActiveObject(newGroup);
