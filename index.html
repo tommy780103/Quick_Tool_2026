@@ -509,9 +509,9 @@
         <div class="drop-zone" id="ps-drop">
           <svg class="drop-zone-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="20" height="28" rx="2"/><rect x="22" y="14" width="20" height="28" rx="2"/><path d="M32 6v8m-4-4h8"/></svg>
           <p class="drop-zone-text">PDF / Excel をドラッグ＆ドロップ</p>
-          <p class="drop-zone-hint">または クリックして選択</p>
+          <p class="drop-zone-hint">または クリックして選択（複数可）</p>
           <div class="drop-zone-formats"><span class="format-badge">PDF</span><span class="format-badge">XLSX</span><span class="format-badge">XLS</span></div>
-          <input type="file" class="drop-zone-input" id="ps-file" accept=".pdf,.xlsx,.xls">
+          <input type="file" class="drop-zone-input" id="ps-file" accept=".pdf,.xlsx,.xls" multiple>
         </div>
         <div class="tool-settings" id="ps-settings" style="display:none">
           <div class="setting-row">
@@ -768,10 +768,6 @@
           <p class="tool-description">長いURLを短縮URLに変換します</p>
         </div>
         <div class="tool-settings">
-          <div class="us-notice">
-            <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm-.75 4.75a.75.75 0 011.5 0v4.5a.75.75 0 01-1.5 0v-4.5zM10 14a1 1 0 100-2 1 1 0 000 2z"/></svg>
-            このツールは外部サービス（is.gd）を利用するため、インターネット接続が必要です
-          </div>
           <div class="setting-row">
             <label class="setting-label">短縮したいURL</label>
             <div class="us-input-row">

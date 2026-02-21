@@ -94,9 +94,6 @@
         selection: true,
       });
 
-      // コンテナに収まるようズーム
-      applyZoom();
-
       fc.setBackgroundImage(imageDataURL, function () {
         fc.renderAll();
         saveState();
@@ -104,7 +101,12 @@
 
       setupCanvasEvents();
       setTool('select');
-      ChoiTool.showToast('画像を読み込みました', 'success');
+
+      // レイアウト確定後にズーム適用（表示直後はサイズ未確定のため遅延）
+      requestAnimationFrame(function () {
+        applyZoom();
+        ChoiTool.showToast('画像を読み込みました', 'success');
+      });
     };
     img.src = imageDataURL;
   }
@@ -116,9 +118,23 @@
 
   function applyZoom() {
     if (!fc) return;
-    const maxW = (containerEl.clientWidth || 800) - 32;
-    const maxH = Math.max(containerEl.clientHeight, window.innerHeight - 250) - 32;
-    const scale = Math.min(1, maxW / originalWidth, maxH / originalHeight);
+    // コンテナの実測幅を取得（ツールバー・プロパティパネルを除いた領域）
+    var containerW = containerEl.clientWidth;
+    // フォールバック: コンテナ幅が取得できない場合はワークスペースから推定
+    if (!containerW || containerW < 100) {
+      var workspace = containerEl.parentElement;
+      var sidebar = 48;   // ツールバー幅
+      var props = 180;    // プロパティパネル幅
+      containerW = (workspace ? workspace.clientWidth : window.innerWidth) - sidebar - props;
+    }
+    var maxW = containerW - 32;
+    // 横画像のときは幅優先でスケーリングし、高さは制約を緩める
+    var isLandscape = originalWidth > originalHeight;
+    var viewH = window.innerHeight - 200;
+    var maxH = isLandscape
+      ? Math.max(viewH, originalHeight * (maxW / originalWidth))
+      : Math.max(containerEl.clientHeight, viewH) - 32;
+    var scale = Math.min(1, maxW / originalWidth, maxH / originalHeight);
     fc.setZoom(scale);
     fc.setWidth(originalWidth * scale);
     fc.setHeight(originalHeight * scale);

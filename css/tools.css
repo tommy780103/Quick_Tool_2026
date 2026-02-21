@@ -382,7 +382,7 @@
   border-radius: 0 0 var(--radius-md) var(--radius-md);
   overflow: hidden;
   background: var(--color-bg);
-  min-height: calc(100vh - 200px);
+  min-height: 400px;
 }
 
 /* ツールバー */
@@ -436,7 +436,7 @@
   min-width: 0;
   overflow: auto;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 16px;
   background: #e5e5e5;

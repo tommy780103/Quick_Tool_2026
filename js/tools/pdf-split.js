@@ -27,7 +27,7 @@
 
   // --- ドロップゾーン初期化 ---
   ChoiTool.initDropZone('ps-drop', 'ps-file', {
-    multiple: false,
+    multiple: true,
     onFiles: handleFiles,
   });
 
@@ -38,25 +38,48 @@
 
   // --- ファイル読み込み ---
   async function handleFiles(files) {
-    var file = files[0];
-    var ext = file.name.toLowerCase().match(/\.[^.]+$/);
-    if (!ext || ACCEPTED_EXTENSIONS.indexOf(ext[0]) === -1) {
+    var valid = files.filter(function (f) {
+      var ext = f.name.toLowerCase().match(/\.[^.]+$/);
+      return ext && ACCEPTED_EXTENSIONS.indexOf(ext[0]) !== -1;
+    });
+    if (valid.length === 0) {
       ChoiTool.showToast('PDF または Excel ファイルを選択してください', 'error');
       return;
     }
 
     try {
-      var pdfBytes;
-      if (isPdf(file)) {
-        pdfBytes = new Uint8Array(await ChoiTool.readFileAs(file, 'arrayBuffer'));
+      if (valid.length === 1) {
+        // 単一ファイル
+        var file = valid[0];
+        var pdfBytes;
+        if (isPdf(file)) {
+          pdfBytes = new Uint8Array(await ChoiTool.readFileAs(file, 'arrayBuffer'));
+        } else {
+          ChoiTool.showToast('Excelを変換中...', 'info');
+          pdfBytes = await ChoiTool.excelToPdfBytes(file);
+        }
+        srcPdfBytes = pdfBytes;
+        srcFileName = file.name.replace(/\.[^.]+$/, '');
       } else {
-        // Excel → PDF変換
-        ChoiTool.showToast('Excelを変換中...', 'info');
-        pdfBytes = await ChoiTool.excelToPdfBytes(file);
+        // 複数ファイル → 結合してから分割
+        ChoiTool.showToast(valid.length + ' ファイルを結合中...', 'info');
+        var mergedPdf = await PDFLib.PDFDocument.create();
+        for (var fi = 0; fi < valid.length; fi++) {
+          var f = valid[fi];
+          var bytes;
+          if (isPdf(f)) {
+            bytes = new Uint8Array(await ChoiTool.readFileAs(f, 'arrayBuffer'));
+          } else {
+            bytes = await ChoiTool.excelToPdfBytes(f);
+          }
+          var doc = await PDFLib.PDFDocument.load(bytes);
+          var pages = await mergedPdf.copyPages(doc, doc.getPageIndices());
+          pages.forEach(function (page) { mergedPdf.addPage(page); });
+        }
+        srcPdfBytes = new Uint8Array(await mergedPdf.save());
+        srcFileName = 'merged';
       }
 
-      srcPdfBytes = pdfBytes;
-      srcFileName = file.name.replace(/\.[^.]+$/, '');
       var pdf = await PDFLib.PDFDocument.load(srcPdfBytes);
       totalPages = pdf.getPageCount();
       totalDisplay.textContent = totalPages;
