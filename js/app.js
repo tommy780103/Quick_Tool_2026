@@ -42,6 +42,28 @@
     }
   }
 
+  // --- カテゴリ折りたたみ ---
+  const sidebarGroups = document.querySelectorAll('.sidebar-group');
+  sidebarGroups.forEach((group) => {
+    const cat = group.querySelector('.sidebar-category');
+    if (!cat) return; // ホームのグループはスキップ
+    cat.addEventListener('click', () => {
+      group.classList.toggle('open');
+    });
+  });
+
+  /** アクティブツールを含むカテゴリを開く */
+  function openCategoryForTool(toolId) {
+    sidebarGroups.forEach((group) => {
+      const items = group.querySelectorAll('.sidebar-item');
+      items.forEach((item) => {
+        if (item.dataset.tool === toolId) {
+          group.classList.add('open');
+        }
+      });
+    });
+  }
+
   // ツール切り替え
   function activateTool(toolId) {
     // サイドバーのアクティブ状態
@@ -54,6 +76,9 @@
       const panelId = panel.id === 'tool-home' ? 'home' : panel.id.replace('tool-', '');
       panel.classList.toggle('active', panelId === toolId);
     });
+
+    // アクティブツールのカテゴリを自動展開
+    openCategoryForTool(toolId);
 
     closeSidebarOnMobile();
 

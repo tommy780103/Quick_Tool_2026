@@ -190,6 +190,28 @@ html, body {
   display: flex;
   align-items: center;
   gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.sidebar-category::before {
+  content: '';
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 5px solid currentColor;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.sidebar-group.open > .sidebar-category::before {
+  transform: rotate(90deg);
+}
+
+.sidebar-group:not(.open) > .sidebar-item {
+  display: none;
 }
 
 .sidebar-count {

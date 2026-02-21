@@ -22,6 +22,13 @@
   var presetsEl  = document.getElementById('cp-presets');
   var savedEl    = document.getElementById('cp-saved');
   var saveBtnEl  = document.getElementById('cp-save-btn');
+  var eyedropperBtn = document.getElementById('cp-eyedropper');
+  var imgDropEl  = document.getElementById('cp-image-drop');
+  var imgFileEl  = document.getElementById('cp-image-file');
+  var imgCanvasWrap = document.getElementById('cp-image-canvas-wrap');
+  var imgCanvas  = document.getElementById('cp-image-canvas');
+  var imgInfo    = document.getElementById('cp-image-info');
+  var imgClearBtn = document.getElementById('cp-image-clear');
 
   // --- 色変換関数 ---
 
@@ -300,6 +307,116 @@
     saveSavedColors(colors);
     renderSavedColors();
     ChoiTool.showToast('色を保存しました', 'success');
+  });
+
+  // --- スポイト（EyeDropper API） ---
+
+  if ('EyeDropper' in window) {
+    eyedropperBtn.addEventListener('click', function () {
+      var dropper = new EyeDropper();
+      dropper.open().then(function (result) {
+        var rgb = hexToRgb(result.sRGBHex);
+        updateAll(rgb.r, rgb.g, rgb.b);
+        ChoiTool.showToast('色を取得しました', 'success');
+      }).catch(function () {
+        // ユーザーがキャンセル
+      });
+    });
+  } else {
+    eyedropperBtn.title = '画像を読み込んでクリックで色を取得できます';
+    eyedropperBtn.addEventListener('click', function () {
+      ChoiTool.showToast('このブラウザはスポイト機能に非対応です。下の画像読み込みから色を取得できます。', 'info');
+    });
+  }
+
+  // --- 画像から色を取得 ---
+
+  var imgCtx = imgCanvas.getContext('2d');
+
+  imgDropEl.addEventListener('click', function () {
+    imgFileEl.click();
+  });
+
+  imgDropEl.addEventListener('dragover', function (e) {
+    e.preventDefault();
+    imgDropEl.classList.add('dragover');
+  });
+
+  imgDropEl.addEventListener('dragleave', function () {
+    imgDropEl.classList.remove('dragover');
+  });
+
+  imgDropEl.addEventListener('drop', function (e) {
+    e.preventDefault();
+    imgDropEl.classList.remove('dragover');
+    if (e.dataTransfer.files.length > 0) {
+      loadImageForPick(e.dataTransfer.files[0]);
+    }
+  });
+
+  imgFileEl.addEventListener('change', function () {
+    if (imgFileEl.files.length > 0) {
+      loadImageForPick(imgFileEl.files[0]);
+    }
+    imgFileEl.value = '';
+  });
+
+  function loadImageForPick(file) {
+    if (!file.type.startsWith('image/')) {
+      ChoiTool.showToast('画像ファイルを選択してください', 'error');
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      var img = new Image();
+      img.onload = function () {
+        // キャンバスサイズ調整（最大幅600px）
+        var maxW = 600;
+        var scale = Math.min(1, maxW / img.width);
+        imgCanvas.width = Math.round(img.width * scale);
+        imgCanvas.height = Math.round(img.height * scale);
+        imgCtx.drawImage(img, 0, 0, imgCanvas.width, imgCanvas.height);
+
+        imgDropEl.style.display = 'none';
+        imgCanvasWrap.style.display = '';
+        imgInfo.textContent = '画像をクリックして色を取得';
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  imgCanvas.addEventListener('click', function (e) {
+    var rect = imgCanvas.getBoundingClientRect();
+    var scaleX = imgCanvas.width / rect.width;
+    var scaleY = imgCanvas.height / rect.height;
+    var x = Math.round((e.clientX - rect.left) * scaleX);
+    var y = Math.round((e.clientY - rect.top) * scaleY);
+
+    var pixel = imgCtx.getImageData(x, y, 1, 1).data;
+    updateAll(pixel[0], pixel[1], pixel[2]);
+    imgInfo.textContent = '取得: rgb(' + pixel[0] + ', ' + pixel[1] + ', ' + pixel[2] + ') @ (' + x + ', ' + y + ')';
+    ChoiTool.showToast('色を取得しました', 'success');
+  });
+
+  imgCanvas.addEventListener('mousemove', function (e) {
+    var rect = imgCanvas.getBoundingClientRect();
+    var scaleX = imgCanvas.width / rect.width;
+    var scaleY = imgCanvas.height / rect.height;
+    var x = Math.round((e.clientX - rect.left) * scaleX);
+    var y = Math.round((e.clientY - rect.top) * scaleY);
+
+    if (x >= 0 && x < imgCanvas.width && y >= 0 && y < imgCanvas.height) {
+      var pixel = imgCtx.getImageData(x, y, 1, 1).data;
+      var hex = rgbToHex(pixel[0], pixel[1], pixel[2]);
+      imgInfo.textContent = hex + ' @ (' + x + ', ' + y + ')';
+    }
+  });
+
+  imgClearBtn.addEventListener('click', function () {
+    imgCanvasWrap.style.display = 'none';
+    imgDropEl.style.display = '';
+    imgInfo.textContent = '';
   });
 
   // --- 初期化 ---

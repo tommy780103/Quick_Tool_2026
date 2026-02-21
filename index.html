@@ -1280,6 +1280,9 @@
           <div class="cp-picker-area">
             <input type="color" id="cp-picker" value="#6366f1" class="cp-color-input">
             <div class="cp-preview" id="cp-preview"></div>
+            <button class="btn btn-secondary" id="cp-eyedropper" title="画面から色を取得">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" style="vertical-align:middle;margin-right:4px"><path d="M17.6 2.4a2 2 0 00-2.83 0l-1.52 1.52-.7-.7a1 1 0 00-1.42 1.41l.71.71-6.37 6.36a2 2 0 00-.53 1l-.6 2.7a1 1 0 001.21 1.2l2.7-.6a2 2 0 001-.53l6.37-6.36.7.7a1 1 0 001.42-1.41l-.71-.71 1.52-1.52a2 2 0 000-2.83l-.95-.94z"/></svg>スポイト
+            </button>
           </div>
           <div class="cp-values">
             <div class="cp-value-row">
@@ -1317,6 +1320,18 @@
           <div class="setting-row">
             <label class="setting-label">B <span id="cp-b-val">241</span></label>
             <input type="range" class="setting-range cp-slider-b" id="cp-b" min="0" max="255" value="241">
+          </div>
+        </div>
+        <div class="cp-section">
+          <div class="setting-label">画像から色を取得</div>
+          <div class="cp-image-drop" id="cp-image-drop">
+            <p>画像をドラッグ＆ドロップ、またはクリックして選択</p>
+            <input type="file" id="cp-image-file" accept="image/*" style="display:none">
+          </div>
+          <div class="cp-image-canvas-wrap" id="cp-image-canvas-wrap" style="display:none">
+            <canvas id="cp-image-canvas"></canvas>
+            <div class="cp-image-info" id="cp-image-info"></div>
+            <button class="btn btn-secondary btn-sm" id="cp-image-clear">画像をクリア</button>
           </div>
         </div>
         <div class="cp-section">

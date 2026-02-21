@@ -731,45 +731,63 @@
   // --- Undo / Redo ---
   var MAX_UNDO = 50;
 
+  /** 背景画像のdataURLを取得 */
+  function getBgDataURL() {
+    if (!fc || !fc.backgroundImage) return null;
+    var el = fc.backgroundImage.getElement();
+    if (!el) return null;
+    // すでにdataURLの場合はsrcから取得
+    if (el.src && el.src.indexOf('data:') === 0) return el.src;
+    // Canvasに描画してdataURL化
+    var c = document.createElement('canvas');
+    c.width = el.naturalWidth || el.width;
+    c.height = el.naturalHeight || el.height;
+    c.getContext('2d').drawImage(el, 0, 0);
+    return c.toDataURL('image/png');
+  }
+
   function saveState() {
     if (isUndoRedoing || !fc) return;
-    var json = JSON.stringify(fc.toJSON());
-    undoStack.push(json);
+    var state = {
+      json: JSON.stringify(fc.toJSON()),
+      bgDataURL: getBgDataURL(),
+    };
+    undoStack.push(state);
     if (undoStack.length > MAX_UNDO) undoStack.shift();
     redoStack = [];
     updateUndoRedoBtns();
   }
 
-  function undo() {
-    if (undoStack.length <= 1 || !fc) return;
+  function restoreState(state) {
     isUndoRedoing = true;
-    redoStack.push(undoStack.pop());
-    var json = undoStack[undoStack.length - 1];
-    var bgImage = fc.backgroundImage;
-    fc.loadFromJSON(json, function () {
-      fc.setBackgroundImage(bgImage, function () {
+    fc.loadFromJSON(state.json, function () {
+      if (state.bgDataURL) {
+        fc.setBackgroundImage(state.bgDataURL, function () {
+          applyZoom();
+          fc.renderAll();
+          isUndoRedoing = false;
+          updateUndoRedoBtns();
+        }, { originX: 'left', originY: 'top', scaleX: 1, scaleY: 1 });
+      } else {
         applyZoom();
         fc.renderAll();
         isUndoRedoing = false;
         updateUndoRedoBtns();
-      });
+      }
     });
+  }
+
+  function undo() {
+    if (undoStack.length <= 1 || !fc) return;
+    redoStack.push(undoStack.pop());
+    restoreState(undoStack[undoStack.length - 1]);
   }
 
   function redo() {
     if (redoStack.length === 0 || !fc) return;
-    isUndoRedoing = true;
-    var json = redoStack.pop();
-    undoStack.push(json);
-    var bgImage = fc.backgroundImage;
-    fc.loadFromJSON(json, function () {
-      fc.setBackgroundImage(bgImage, function () {
-        applyZoom();
-        fc.renderAll();
-        isUndoRedoing = false;
-        updateUndoRedoBtns();
-      });
-    });
+    var state = redoStack.pop();
+    undoStack.push(state);
+    restoreState(state);
   }
 
   function updateUndoRedoBtns() {
