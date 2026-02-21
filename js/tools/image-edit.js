@@ -43,8 +43,8 @@
   const blurRadiusInput = document.getElementById('ie-blur-radius');
   const blurRadiusVal = document.getElementById('ie-blur-radius-val');
 
-  // クリア（透明）状態
-  let fillIsClear = false;
+  // クリア（透明）状態 — デフォルトは塗りクリア（四角・丸は透明塗り）
+  let fillIsClear = true;
   let strokeIsClear = false;
 
   // --- 状態 ---
@@ -110,6 +110,10 @@
       setupCanvasEvents();
       setTool('select');
 
+      // 初期クリア状態をUIに反映
+      setFillClear(fillIsClear);
+      setStrokeClear(strokeIsClear);
+
       // レイアウト確定後にズーム適用（表示直後はサイズ未確定のため遅延）
       requestAnimationFrame(function () {
         applyZoom();
@@ -174,6 +178,29 @@
     } else if (name === 'blur') {
       fc.defaultCursor = 'crosshair';
       showBlurProps();
+    } else if (name === 'arrow') {
+      // 矢印デフォルト: 赤、太さ3
+      fc.defaultCursor = 'crosshair';
+      setFillClear(false);
+      fillInput.value = '#ff0000';
+      strokeInput.value = '#ff0000';
+      strokeWidthInput.value = 3;
+      setStrokeClear(false);
+      hideAllProps();
+    } else if (name === 'rect' || name === 'ellipse') {
+      // 四角・丸デフォルト: 塗りクリア、線赤、太さ2
+      fc.defaultCursor = 'crosshair';
+      setFillClear(true);
+      strokeInput.value = '#ff0000';
+      strokeWidthInput.value = 2;
+      setStrokeClear(false);
+      hideAllProps();
+    } else if (name === 'text') {
+      // テキストデフォルト: 赤
+      fc.defaultCursor = 'crosshair';
+      setFillClear(false);
+      fillInput.value = '#ff0000';
+      hideAllProps();
     } else {
       fc.defaultCursor = 'crosshair';
       hideAllProps();
@@ -196,7 +223,6 @@
     fc.on('selection:cleared', onSelectionCleared);
     fc.on('object:modified', function () { saveState(); });
     fc.on('path:created', function () { saveState(); });
-    fc.on('mouse:dblclick', onDblClick);
   }
 
   function getPointer(opt) {
@@ -214,11 +240,6 @@
 
     if (currentTool === 'text') {
       addText(p.x, p.y);
-      setTool('select');
-      return;
-    }
-    if (currentTool === 'comment') {
-      addComment(p.x, p.y);
       setTool('select');
       return;
     }
@@ -335,11 +356,11 @@
 
     // モザイク・ぼかし: 選択範囲に効果を適用して戻る
     if (currentTool === 'mosaic' || currentTool === 'blur') {
-      var zoom = fc.getZoom();
-      var left = Math.round(tempShape.left / zoom);
-      var top = Math.round(tempShape.top / zoom);
-      var w = Math.round(tempShape.width / zoom);
-      var h = Math.round(tempShape.height / zoom);
+      // tempShapeの座標は既にキャンバス論理座標（=画像ピクセル座標）
+      var left = Math.round(tempShape.left);
+      var top = Math.round(tempShape.top);
+      var w = Math.round(tempShape.width);
+      var h = Math.round(tempShape.height);
 
       // 画像範囲にクランプ
       left = Math.max(0, left);
@@ -405,10 +426,11 @@
 
   // --- テキスト追加 ---
   function addText(x, y) {
+    var textFill = getFillColor() === 'transparent' ? '#ff0000' : getFillColor();
     var text = new fabric.IText('テキスト', {
       left: x, top: y,
       fontSize: parseInt(fontSizeInput.value, 10) || 24,
-      fill: getFillColor(),
+      fill: textFill,
       fontFamily: 'Meiryo, Yu Gothic, sans-serif',
       editable: true,
     });
@@ -419,38 +441,6 @@
     saveState();
   }
 
-  // --- コメント追加 ---
-  function addComment(x, y) {
-    var textColor = getFillColor() === 'transparent' ? '#ff0000' : getFillColor();
-    var textObj = new fabric.IText('コメント', {
-      fontSize: 14,
-      fill: textColor,
-      fontFamily: 'Meiryo, Yu Gothic, sans-serif',
-      originX: 'center',
-      originY: 'center',
-    });
-
-    var pad = 12;
-    var borderColor = getStrokeColor() === 'transparent' ? '#ff0000' : getStrokeColor();
-    var bg = new fabric.Rect({
-      width: textObj.width + pad * 2,
-      height: textObj.height + pad * 2,
-      fill: '#fffde7',
-      stroke: borderColor,
-      strokeWidth: 2,
-      rx: 6, ry: 6,
-      originX: 'center', originY: 'center',
-    });
-
-    var group = new fabric.Group([bg, textObj], {
-      left: x, top: y,
-    });
-    group._isComment = true;
-
-    fc.add(group);
-    fc.setActiveObject(group);
-    saveState();
-  }
 
   // --- モザイク適用 ---
   function applyMosaicToRegion(left, top, width, height, blockSize) {
@@ -538,77 +528,6 @@
     }, { originX: 'left', originY: 'top', scaleX: 1, scaleY: 1 });
   }
 
-  // --- ダブルクリック → コメント編集 ---
-  function onDblClick(opt) {
-    var target = opt.target;
-    if (!target || target.type !== 'group') return;
-
-    var items = target.getObjects();
-    var textItem = items.find(function (o) { return o.type === 'i-text'; });
-    if (!textItem) return;
-
-    var isComment = target._isComment;
-
-    // グループの中心座標（キャンバス絶対座標）を取得
-    var center = target.getCenterPoint();
-    var sx = target.scaleX || 1;
-    var sy = target.scaleY || 1;
-
-    // グループ解除 — 子要素の座標をグループ中心からの相対→キャンバス絶対に変換
-    fc.remove(target);
-    items.forEach(function (item) {
-      item.set({
-        left: center.x + item.left * sx,
-        top: center.y + item.top * sy,
-        originX: 'center',
-        originY: 'center',
-      });
-      item.setCoords();
-      fc.add(item);
-    });
-
-    fc.setActiveObject(textItem);
-    textItem.enterEditing();
-    textItem.selectAll();
-    fc.renderAll();
-
-    textItem.on('editing:exited', function regroup() {
-      textItem.off('editing:exited', regroup);
-
-      // 背景のサイズをテキストに合わせて更新
-      var rectItem = items.find(function (o) { return o.type === 'rect'; });
-      if (rectItem) {
-        rectItem.set({
-          width: textItem.width + 24,
-          height: textItem.height + 24,
-        });
-      }
-
-      // テキストの現在位置を再グループ化の基準にする
-      var newCenterX = textItem.left;
-      var newCenterY = textItem.top;
-
-      // キャンバスから全アイテム削除
-      items.forEach(function (item) { fc.remove(item); });
-
-      // グループ内ローカル座標(0,0)にリセットして再グループ化
-      items.forEach(function (item) {
-        item.set({ left: 0, top: 0, originX: 'center', originY: 'center' });
-      });
-
-      var newGroup = new fabric.Group(items, {
-        left: newCenterX,
-        top: newCenterY,
-        originX: 'center',
-        originY: 'center',
-      });
-      newGroup._isComment = isComment;
-      fc.add(newGroup);
-      fc.setActiveObject(newGroup);
-      fc.renderAll();
-      saveState();
-    });
-  }
 
   // --- プロパティパネル ---
   function hideAllProps() {

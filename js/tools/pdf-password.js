@@ -334,37 +334,10 @@
   }
 
   // ===========================================================================
-  //  PDFバイト列操作ヘルパー
+  //  ヘルパー
   // ===========================================================================
 
-  /**
-   * Uint8Arrayを文字列として読む（Latin-1/バイナリセーフ）
-   */
-  function bytesToStr(bytes) {
-    var parts = [];
-    var CHUNK = 8192;
-    for (var i = 0; i < bytes.length; i += CHUNK) {
-      var end = Math.min(i + CHUNK, bytes.length);
-      var slice = bytes.subarray(i, end);
-      parts.push(String.fromCharCode.apply(null, slice));
-    }
-    return parts.join('');
-  }
-
-  /**
-   * 文字列をUint8Arrayに変換（Latin-1）
-   */
-  function strToBytes(str) {
-    var bytes = new Uint8Array(str.length);
-    for (var i = 0; i < str.length; i++) {
-      bytes[i] = str.charCodeAt(i) & 0xff;
-    }
-    return bytes;
-  }
-
-  /**
-   * バイト列をPDFヘキサ文字列に変換
-   */
+  /** バイト列をPDFヘキサ文字列に変換 */
   function bytesToHex(bytes) {
     var hex = '';
     for (var i = 0; i < bytes.length; i++) {
@@ -373,9 +346,7 @@
     return hex;
   }
 
-  /**
-   * 16進数文字列からUint8Arrayへ変換
-   */
+  /** 16進数文字列からUint8Arrayへ変換 */
   function hexToBytes(hex) {
     var bytes = new Uint8Array(hex.length / 2);
     for (var i = 0; i < hex.length; i += 2) {
@@ -384,83 +355,7 @@
     return bytes;
   }
 
-  /**
-   * PDFのFile ID（/ID配列の最初の要素）を取得
-   * なければランダムに16バイト生成
-   */
-  function extractFileId(pdfStr) {
-    // /ID [<hex><hex>] or /ID[<hex><hex>] パターンを検索
-    var match = pdfStr.match(/\/ID\s*\[\s*<([0-9a-fA-F]+)>/);
-    if (match) {
-      return hexToBytes(match[1]);
-    }
-    // なければランダム生成
-    var id = new Uint8Array(16);
-    for (var i = 0; i < 16; i++) {
-      id[i] = Math.floor(Math.random() * 256);
-    }
-    return id;
-  }
-
-  /**
-   * PDFの%%EOF位置を見つける
-   */
-  function findLastEof(pdfStr) {
-    var idx = pdfStr.lastIndexOf('%%EOF');
-    return idx;
-  }
-
-  /**
-   * PDFのxref/trailerセクションの開始位置を見つける
-   * startxrefの値からxrefテーブルの位置を取得
-   */
-  function findStartXref(pdfStr) {
-    var match = pdfStr.match(/startxref\s+(\d+)\s+%%EOF\s*$/);
-    if (!match) {
-      // 末尾から逆方向に探す
-      var lastIdx = pdfStr.lastIndexOf('startxref');
-      if (lastIdx === -1) return -1;
-      var sub = pdfStr.substring(lastIdx);
-      var m2 = sub.match(/startxref\s+(\d+)/);
-      if (m2) return parseInt(m2[1]);
-      return -1;
-    }
-    return parseInt(match[1]);
-  }
-
-  /**
-   * trailerの/Root参照を取得
-   */
-  function findRootRef(pdfStr) {
-    var match = pdfStr.match(/\/Root\s+(\d+)\s+(\d+)\s+R/);
-    if (match) {
-      return { objNum: parseInt(match[1]), genNum: parseInt(match[2]) };
-    }
-    return null;
-  }
-
-  /**
-   * PDFの最大オブジェクト番号を取得
-   */
-  function findMaxObjNum(pdfStr) {
-    var max = 0;
-    var re = /(\d+)\s+\d+\s+obj/g;
-    var match;
-    while ((match = re.exec(pdfStr)) !== null) {
-      var num = parseInt(match[1]);
-      if (num > max) max = num;
-    }
-    return max;
-  }
-
-  // ===========================================================================
-  //  ストリーム・文字列の暗号化
-  // ===========================================================================
-
-  /**
-   * オブジェクトごとの暗号化キーを計算
-   * encKey + objNum(3bytes LE) + genNum(2bytes LE) → MD5 → 先頭 min(keyLen+5, 16) bytes
-   */
+  /** オブジェクトごとの暗号化キーを計算 */
   function computeObjectKey(encKey, objNum, genNum) {
     var input = new Uint8Array(encKey.length + 5);
     input.set(encKey);
@@ -470,398 +365,173 @@
     input[encKey.length + 3] = genNum & 0xff;
     input[encKey.length + 4] = (genNum >> 8) & 0xff;
     var hash = md5(input);
-    // min(encKey.length + 5, 16) = min(5+5, 16) = 10
     return hash.subarray(0, Math.min(encKey.length + 5, 16));
   }
 
-  /**
-   * PDFバイト列内のstream...endstreamを暗号化
-   * ストリームの内容をRC4で暗号化する
-   */
-  function encryptStreams(pdfStr, encKey) {
-    // 各 N G obj ... stream\r\n...endstream を見つけて暗号化
-    // 注意: 改行は \r\n or \n
-    var result = pdfStr;
-    var objPattern = /(\d+)\s+(\d+)\s+obj\b/g;
-    var objects = [];
-    var m;
-    while ((m = objPattern.exec(pdfStr)) !== null) {
-      objects.push({
-        objNum: parseInt(m[1]),
-        genNum: parseInt(m[2]),
-        startIndex: m.index
-      });
+  /** Uint8ArrayをLatin-1文字列に変換（位置検索用、バイト位置と1:1対応） */
+  function bytesToLatin1(bytes) {
+    var parts = [];
+    var CHUNK = 8192;
+    for (var i = 0; i < bytes.length; i += CHUNK) {
+      var end = Math.min(i + CHUNK, bytes.length);
+      parts.push(String.fromCharCode.apply(null, bytes.subarray(i, end)));
     }
-
-    // オブジェクトごとにstream内容を暗号化（後方から処理して位置がずれないようにする）
-    var replacements = [];
-
-    for (var i = 0; i < objects.length; i++) {
-      var obj = objects[i];
-      var objEnd = (i + 1 < objects.length) ? objects[i + 1].startIndex : pdfStr.length;
-      var objBody = pdfStr.substring(obj.startIndex, objEnd);
-
-      // stream の位置を見つける
-      var streamMatch = objBody.match(/stream(\r?\n)/);
-      if (!streamMatch) continue;
-
-      var streamStart = objBody.indexOf(streamMatch[0]) + streamMatch[0].length;
-      var endStreamIdx = objBody.indexOf('endstream', streamStart);
-      if (endStreamIdx === -1) continue;
-
-      // stream内容をバイト列に変換
-      var streamContent = objBody.substring(streamStart, endStreamIdx);
-      // 末尾に\r\nまたは\nがある場合は除去（PDF仕様）
-      if (streamContent.endsWith('\r\n')) {
-        streamContent = streamContent.substring(0, streamContent.length - 2);
-      } else if (streamContent.endsWith('\n')) {
-        streamContent = streamContent.substring(0, streamContent.length - 1);
-      }
-
-      var streamBytes = strToBytes(streamContent);
-      var objKey = computeObjectKey(encKey, obj.objNum, obj.genNum);
-      var encrypted = rc4(objKey, streamBytes);
-      var encryptedStr = bytesToStr(encrypted);
-
-      // 置換情報を記録
-      var absStreamStart = obj.startIndex + streamStart;
-      var absStreamEnd = obj.startIndex + endStreamIdx;
-      // 末尾改行の調整
-      if (pdfStr.charAt(absStreamEnd - 1) === '\n') {
-        if (pdfStr.charAt(absStreamEnd - 2) === '\r') {
-          absStreamEnd -= 2;
-        } else {
-          absStreamEnd -= 1;
-        }
-      }
-
-      replacements.push({
-        start: absStreamStart,
-        end: absStreamEnd,
-        content: encryptedStr + '\n'
-      });
-    }
-
-    // 後方から置換
-    replacements.sort(function (a, b) { return b.start - a.start; });
-    for (var r = 0; r < replacements.length; r++) {
-      result = result.substring(0, replacements[r].start) +
-               replacements[r].content +
-               result.substring(replacements[r].end);
-    }
-
-    return result;
+    return parts.join('');
   }
 
-  /**
-   * PDF文字列リテラル (...) を暗号化
-   * ()内の文字列をRC4で暗号化
-   */
-  function encryptStringLiterals(pdfStr, encKey) {
-    var result = pdfStr;
-    var objPattern = /(\d+)\s+(\d+)\s+obj\b/g;
-    var objects = [];
-    var m;
-    while ((m = objPattern.exec(pdfStr)) !== null) {
-      objects.push({
-        objNum: parseInt(m[1]),
-        genNum: parseInt(m[2]),
-        startIndex: m.index
-      });
-    }
-
-    var replacements = [];
-
-    for (var i = 0; i < objects.length; i++) {
-      var obj = objects[i];
-      var objEnd = (i + 1 < objects.length) ? objects[i + 1].startIndex : pdfStr.length;
-      var objBody = pdfStr.substring(obj.startIndex, objEnd);
-
-      // streamセクション以外の文字列を暗号化
-      var streamIdx = objBody.indexOf('stream');
-      var searchEnd = streamIdx !== -1 ? streamIdx : objBody.length;
-      var bodyToSearch = objBody.substring(0, searchEnd);
-
-      // 括弧の対応を辿って文字列リテラルを見つける
-      var strLiterals = findStringLiterals(bodyToSearch);
-
-      for (var s = strLiterals.length - 1; s >= 0; s--) {
-        var lit = strLiterals[s];
-        var strBytes = decodePdfStringLiteral(lit.content);
-        var objKey = computeObjectKey(encKey, obj.objNum, obj.genNum);
-        var encrypted = rc4(objKey, strBytes);
-        var hexStr = '<' + bytesToHex(encrypted) + '>';
-
-        replacements.push({
-          start: obj.startIndex + lit.start,
-          end: obj.startIndex + lit.end,
-          content: hexStr
-        });
-      }
-    }
-
-    // 後方から置換
-    replacements.sort(function (a, b) { return b.start - a.start; });
-    for (var r = 0; r < replacements.length; r++) {
-      result = result.substring(0, replacements[r].start) +
-               replacements[r].content +
-               result.substring(replacements[r].end);
-    }
-
-    return result;
-  }
-
-  /**
-   * PDF文字列リテラルの位置を検出
-   * 括弧のネストとエスケープを考慮
-   */
-  function findStringLiterals(str) {
-    var literals = [];
-    var i = 0;
-    while (i < str.length) {
-      if (str[i] === '(') {
-        var start = i;
-        var depth = 1;
-        i++;
-        while (i < str.length && depth > 0) {
-          if (str[i] === '\\') {
-            i += 2; // エスケープをスキップ
-            continue;
-          }
-          if (str[i] === '(') depth++;
-          if (str[i] === ')') depth--;
-          i++;
-        }
-        if (depth === 0) {
-          literals.push({
-            start: start,
-            end: i,
-            content: str.substring(start + 1, i - 1)
-          });
-        }
-      } else {
-        i++;
-      }
-    }
-    return literals;
-  }
-
-  /**
-   * PDF文字列リテラルをバイト配列にデコード
-   * エスケープシーケンスを処理
-   */
-  function decodePdfStringLiteral(str) {
-    var bytes = [];
-    var i = 0;
-    while (i < str.length) {
-      if (str[i] === '\\') {
-        i++;
-        if (i >= str.length) break;
-        switch (str[i]) {
-          case 'n':  bytes.push(0x0a); i++; break;
-          case 'r':  bytes.push(0x0d); i++; break;
-          case 't':  bytes.push(0x09); i++; break;
-          case 'b':  bytes.push(0x08); i++; break;
-          case 'f':  bytes.push(0x0c); i++; break;
-          case '(':  bytes.push(0x28); i++; break;
-          case ')':  bytes.push(0x29); i++; break;
-          case '\\': bytes.push(0x5c); i++; break;
-          default:
-            // 8進数エスケープ
-            if (str[i] >= '0' && str[i] <= '7') {
-              var oct = str[i]; i++;
-              if (i < str.length && str[i] >= '0' && str[i] <= '7') { oct += str[i]; i++; }
-              if (i < str.length && str[i] >= '0' && str[i] <= '7') { oct += str[i]; i++; }
-              bytes.push(parseInt(oct, 8) & 0xff);
-            } else {
-              bytes.push(str.charCodeAt(i) & 0xff); i++;
-            }
-        }
-      } else {
-        bytes.push(str.charCodeAt(i) & 0xff);
-        i++;
-      }
-    }
-    return new Uint8Array(bytes);
-  }
-
-  // ===========================================================================
-  //  メインの暗号化処理
-  // ===========================================================================
-
-  /**
-   * PDFにパスワード保護を適用する
-   * pdf-libで再保存した後、バイナリレベルで暗号化辞書を挿入し
-   * ストリームと文字列リテラルをRC4で暗号化する
-   */
-  async function encryptPdf(pdfBytes, userPassword, ownerPassword, permissions) {
-    // 1. pdf-libで読み込み・再保存（クリーンなPDFを得る）
-    var pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
-    var cleanBytes = await pdfDoc.save();
-
-    // 2. バイト列を文字列として扱う
-    var pdfStr = bytesToStr(new Uint8Array(cleanBytes));
-
-    // 3. File IDを取得/生成
-    var fileId = extractFileId(pdfStr);
-    var fileIdHex = bytesToHex(fileId);
-
-    // 4. 暗号化パラメータを計算
-    var oValue = computeOwnerValue(ownerPassword, userPassword);
-    var encKey = computeEncryptionKey(userPassword, oValue, permissions, fileId);
-    var uValue = computeUserValue(encKey);
-
-    // 5. ストリームと文字列を暗号化
-    var encryptedPdf = encryptStreams(pdfStr, encKey);
-    encryptedPdf = encryptStringLiterals(encryptedPdf, encKey);
-
-    // 6. 新しいオブジェクト番号を取得
-    var maxObj = findMaxObjNum(encryptedPdf);
-    var encryptObjNum = maxObj + 1;
-
-    // 7. /Encrypt辞書オブジェクトを作成
-    var oHex = bytesToHex(oValue);
-    var uHex = bytesToHex(uValue);
-
-    var encryptObj =
-      encryptObjNum + ' 0 obj\n' +
-      '<< /Filter /Standard /V 1 /R 2 /Length 40\n' +
-      '   /O <' + oHex + '>\n' +
-      '   /U <' + uHex + '>\n' +
-      '   /P ' + permissions + '\n' +
-      '>>\n' +
-      'endobj\n';
-
-    // 8. trailer を修正して /Encrypt 参照と /ID を追加
-    //    末尾のxref+trailerセクションを再構築する
-
-    // startxref位置を取得
-    var startXrefOffset = findStartXref(encryptedPdf);
-    var eofIdx = findLastEof(encryptedPdf);
-
-    // trailer辞書を見つける
-    var trailerMatch = encryptedPdf.lastIndexOf('trailer');
-    if (trailerMatch === -1) {
-      // クロスリファレンスストリームの場合（pdf-libはこちらを使う可能性が高い）
-      return encryptPdfWithXRefStream(encryptedPdf, encryptObj, encryptObjNum, fileIdHex, permissions, oValue, uValue, encKey);
-    }
-
-    // 従来のtrailer形式
-    var trailerStr = encryptedPdf.substring(trailerMatch, eofIdx);
-
-    // trailer辞書に /Encrypt と /ID を追加
-    var newTrailer = trailerStr.replace(
-      /trailer\s*<<\s*/,
-      'trailer\n<< /Encrypt ' + encryptObjNum + ' 0 R /ID [<' + fileIdHex + '><' + fileIdHex + '>]\n   '
-    );
-
-    // 暗号化オブジェクトを挿入し、xrefを再構築
-    var beforeTrailer = encryptedPdf.substring(0, trailerMatch);
-    var encryptObjOffset = beforeTrailer.length;
-
-    // 暗号化オブジェクトを追加
-    var withEncrypt = beforeTrailer + encryptObj;
-    var newXrefOffset = withEncrypt.length;
-
-    // xref追記
-    var xrefSection =
-      'xref\n' +
-      encryptObjNum + ' 1\n' +
-      padXrefOffset(encryptObjOffset) + ' 00000 n \n';
-
-    // 新しいtrailerを構築
-    // /Size を更新
-    var sizeMatch = trailerStr.match(/\/Size\s+(\d+)/);
-    var newSize = sizeMatch ? Math.max(parseInt(sizeMatch[1]), encryptObjNum + 1) : encryptObjNum + 1;
-    var rootRef = findRootRef(encryptedPdf);
-
-    var finalTrailer =
-      'trailer\n' +
-      '<< /Size ' + newSize +
-      ' /Root ' + rootRef.objNum + ' ' + rootRef.genNum + ' R' +
-      ' /Encrypt ' + encryptObjNum + ' 0 R' +
-      ' /ID [<' + fileIdHex + '><' + fileIdHex + '>]';
-
-    // /Info があれば引き継ぐ
-    var infoMatch = trailerStr.match(/\/Info\s+(\d+)\s+(\d+)\s+R/);
-    if (infoMatch) {
-      finalTrailer += ' /Info ' + infoMatch[1] + ' ' + infoMatch[2] + ' R';
-    }
-
-    // /Prev があれば設定（増分更新用）
-    finalTrailer += ' /Prev ' + startXrefOffset;
-    finalTrailer += ' >>\n';
-
-    var result = withEncrypt + xrefSection + finalTrailer +
-                 'startxref\n' + newXrefOffset + '\n%%EOF\n';
-
-    return strToBytes(result);
-  }
-
-  /**
-   * クロスリファレンスストリーム形式のPDFを暗号化する
-   * pdf-libはxref streamを使うので、このケースが主になる
-   */
-  function encryptPdfWithXRefStream(pdfStr, encryptObj, encryptObjNum, fileIdHex, permissions, oValue, uValue, encKey) {
-    // pdf-libが生成するxref streamを使ったPDFの場合
-    // 増分更新（incremental update）でtrailerを追加する方式を使う
-
-    var startXrefOffset = findStartXref(pdfStr);
-    var rootRef = findRootRef(pdfStr);
-
-    if (!rootRef) {
-      throw new Error('PDF /Root参照が見つかりません');
-    }
-
-    // /Info参照を探す
-    var infoMatch = pdfStr.match(/\/Info\s+(\d+)\s+(\d+)\s+R/);
-
-    // /Sizeを探す
-    var sizeMatch = pdfStr.match(/\/Size\s+(\d+)/);
-    var currentSize = sizeMatch ? parseInt(sizeMatch[1]) : encryptObjNum;
-    var newSize = Math.max(currentSize, encryptObjNum + 1);
-
-    // 暗号化オブジェクトを元のPDFの末尾(%%EOF の後)に追加
-    var encObjOffset = pdfStr.length;
-    var withEncObj = pdfStr + '\n' + encryptObj;
-
-    // xrefテーブル（増分更新）
-    var xrefOffset = withEncObj.length;
-    var xrefSection =
-      'xref\n' +
-      '0 1\n' +
-      '0000000000 65535 f \n' +
-      encryptObjNum + ' 1\n' +
-      padXrefOffset(encObjOffset + 1) + ' 00000 n \n'; // +1 for \n
-
-    // trailer
-    var trailer =
-      'trailer\n' +
-      '<< /Size ' + newSize +
-      ' /Root ' + rootRef.objNum + ' ' + rootRef.genNum + ' R' +
-      ' /Encrypt ' + encryptObjNum + ' 0 R' +
-      ' /ID [<' + fileIdHex + '><' + fileIdHex + '>]';
-
-    if (infoMatch) {
-      trailer += ' /Info ' + infoMatch[1] + ' ' + infoMatch[2] + ' R';
-    }
-
-    trailer += ' /Prev ' + startXrefOffset;
-    trailer += ' >>\n';
-
-    var result = withEncObj + xrefSection + trailer +
-                 'startxref\n' + xrefOffset + '\n%%EOF\n';
-
-    return strToBytes(result);
-  }
-
-  /**
-   * xrefオフセットを10桁にゼロパディング
-   */
+  /** xrefオフセットを10桁にゼロパディング */
   function padXrefOffset(offset) {
     var str = String(offset);
     while (str.length < 10) str = '0' + str;
     return str;
+  }
+
+  // ===========================================================================
+  //  メインの暗号化処理
+  //
+  //  方針:
+  //  1. pdf-lib で従来型 xref 形式に正規化 (useObjectStreams: false)
+  //  2. 各オブジェクトのストリームを /Length を頼りに特定し
+  //     RC4 で in-place 暗号化（RC4 はサイズ不変 → xref オフセット維持）
+  //  3. 増分更新で /Encrypt 辞書を追加
+  // ===========================================================================
+
+  async function encryptPdf(pdfBytes, userPassword, ownerPassword, permissions) {
+    // --- Step 1: pdf-lib で正規化（従来型 xref を強制） ---
+    var pdfDoc = await PDFLib.PDFDocument.load(pdfBytes, { ignoreEncryption: true });
+    var savedBuf = await pdfDoc.save({ useObjectStreams: false });
+    var pdf = new Uint8Array(savedBuf);
+
+    // 位置検索用にLatin-1文字列化（バイト位置と1:1対応）
+    var pdfText = bytesToLatin1(pdf);
+
+    // --- Step 2: File ID を取得/生成 ---
+    var fileId;
+    var idMatch = pdfText.match(/\/ID\s*\[\s*<([0-9a-fA-F]+)>/);
+    if (idMatch) {
+      fileId = hexToBytes(idMatch[1]);
+    } else {
+      fileId = new Uint8Array(16);
+      crypto.getRandomValues(fileId);
+    }
+
+    // --- Step 3: 暗号化パラメータ計算 ---
+    var oValue = computeOwnerValue(ownerPassword, userPassword);
+    var encKey = computeEncryptionKey(userPassword, oValue, permissions, fileId);
+    var uValue = computeUserValue(encKey);
+
+    // --- Step 4: 各オブジェクトのストリームを RC4 暗号化（in-place） ---
+    var objRe = /(\d+)\s+(\d+)\s+obj\b/g;
+    var m;
+    while ((m = objRe.exec(pdfText)) !== null) {
+      var objNum = parseInt(m[1]);
+      var genNum = parseInt(m[2]);
+      var afterObj = m.index + m[0].length;
+
+      // endobj を探す
+      var endObjPos = pdfText.indexOf('endobj', afterObj);
+      if (endObjPos === -1) continue;
+      var objSlice = pdfText.substring(afterObj, endObjPos);
+
+      // stream キーワードを探す
+      var sIdx = objSlice.indexOf('stream');
+      if (sIdx === -1) continue;
+
+      // "stream" の直後は \r\n or \n（PDF 仕様）
+      var streamKwEnd = afterObj + sIdx + 6;
+      var dataStart = streamKwEnd;
+      if (pdf[dataStart] === 0x0D && pdf[dataStart + 1] === 0x0A) {
+        dataStart += 2;
+      } else if (pdf[dataStart] === 0x0A) {
+        dataStart += 1;
+      }
+
+      // /Length からストリームのバイト長を取得
+      var lenMatch = objSlice.match(/\/Length\s+(\d+)/);
+      if (!lenMatch) continue;
+      var streamLen = parseInt(lenMatch[1]);
+      if (streamLen <= 0 || dataStart + streamLen > pdf.length) continue;
+
+      // RC4 暗号化（in-place — サイズは変わらない）
+      var objKey = computeObjectKey(encKey, objNum, genNum);
+      var encrypted = rc4(objKey, pdf.subarray(dataStart, dataStart + streamLen));
+      pdf.set(encrypted, dataStart);
+    }
+
+    // --- Step 5: 増分更新で /Encrypt 辞書を追加 ---
+    // 最大オブジェクト番号
+    var maxObj = 0;
+    var numRe = /(\d+)\s+\d+\s+obj\b/g;
+    var nm;
+    while ((nm = numRe.exec(pdfText)) !== null) {
+      var n = parseInt(nm[1]);
+      if (n > maxObj) maxObj = n;
+    }
+    var encObjNum = maxObj + 1;
+
+    // 既存の startxref 値
+    var sxMatch = pdfText.match(/startxref\s+(\d+)/);
+    var prevXref = sxMatch ? sxMatch[1] : '0';
+
+    // /Root
+    var rootMatch = pdfText.match(/\/Root\s+(\d+)\s+(\d+)\s+R/);
+    if (!rootMatch) throw new Error('/Root が見つかりません');
+
+    // /Info
+    var infoMatch = pdfText.match(/\/Info\s+(\d+)\s+(\d+)\s+R/);
+
+    // /Size
+    var sizeMatch = pdfText.match(/\/Size\s+(\d+)/);
+    var newSize = Math.max(sizeMatch ? parseInt(sizeMatch[1]) : 0, encObjNum + 1);
+
+    var fileIdHex = bytesToHex(fileId);
+    var oHex = bytesToHex(oValue);
+    var uHex = bytesToHex(uValue);
+
+    // Encrypt オブジェクト
+    var encObjStr =
+      encObjNum + ' 0 obj\n' +
+      '<< /Filter /Standard /V 1 /R 2 /Length 40\n' +
+      '   /O <' + oHex + '>\n' +
+      '   /U <' + uHex + '>\n' +
+      '   /P ' + permissions + '\n' +
+      '>>\nendobj\n';
+
+    var encObjOffset = pdf.length + 1; // +1 for leading \n
+
+    // xref セクション
+    var xrefStr =
+      'xref\n' +
+      '0 1\n' +
+      '0000000000 65535 f \n' +
+      encObjNum + ' 1\n' +
+      padXrefOffset(encObjOffset) + ' 00000 n \n';
+
+    var xrefOffset = encObjOffset + encObjStr.length;
+
+    // trailer
+    var trailerStr =
+      'trailer\n<< /Size ' + newSize +
+      ' /Root ' + rootMatch[1] + ' ' + rootMatch[2] + ' R' +
+      ' /Encrypt ' + encObjNum + ' 0 R' +
+      ' /ID [<' + fileIdHex + '><' + fileIdHex + '>]';
+    if (infoMatch) {
+      trailerStr += ' /Info ' + infoMatch[1] + ' ' + infoMatch[2] + ' R';
+    }
+    trailerStr += ' /Prev ' + prevXref + ' >>\n';
+    trailerStr += 'startxref\n' + xrefOffset + '\n%%EOF\n';
+
+    // 全体を結合（\n + Encrypt obj + xref + trailer）
+    var appendStr = '\n' + encObjStr + xrefStr + trailerStr;
+    var appendBytes = new Uint8Array(appendStr.length);
+    for (var i = 0; i < appendStr.length; i++) {
+      appendBytes[i] = appendStr.charCodeAt(i) & 0xff;
+    }
+
+    var result = new Uint8Array(pdf.length + appendBytes.length);
+    result.set(pdf);
+    result.set(appendBytes, pdf.length);
+    return result;
   }
 
   // ===========================================================================
