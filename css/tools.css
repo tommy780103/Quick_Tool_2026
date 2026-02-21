@@ -1244,6 +1244,525 @@
 }
 .ecc-no-issues-icon { font-size: 32px; margin-bottom: 8px; }
 
+/* ============================================
+   背景除去 (bg-remove)
+   ============================================ */
+.bgr-canvas-wrap {
+  position: relative;
+  margin: 16px 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: auto;
+  max-height: 600px;
+  background-color: #e5e5e5;
+  background-image:
+    linear-gradient(45deg, #d0d0d0 25%, transparent 25%),
+    linear-gradient(-45deg, #d0d0d0 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #d0d0d0 75%),
+    linear-gradient(-45deg, transparent 75%, #d0d0d0 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+
+.bgr-canvas-wrap canvas {
+  display: block;
+  max-width: 100%;
+  cursor: crosshair;
+}
+
+/* ============================================
+   画像結合 (image-merge)
+   ============================================ */
+#imgm-preview img,
+#imgm-preview canvas {
+  max-width: 100%;
+  max-height: 400px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+/* ============================================
+   PDFパスワード設定 (pdf-password)
+   ============================================ */
+.pp-password-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pp-password-row .setting-input {
+  flex: 1;
+  max-width: none;
+}
+
+.pp-toggle-btn {
+  min-width: 52px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.pp-permissions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 4px 0;
+  font-size: 13px;
+}
+
+.pp-permissions label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+/* ============================================
+   PDFテキスト抽出 (pdf-text)
+   ============================================ */
+.pt-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.pt-tab {
+  padding: 6px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: var(--font-family);
+  transition: all var(--transition);
+}
+
+.pt-tab:hover { background: var(--color-surface-hover); }
+.pt-tab.active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.pt-textarea {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+/* ============================================
+   Excel差分比較 (excel-diff)
+   ============================================ */
+.ed-drop-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.ed-drop-col { display: flex; flex-direction: column; }
+
+.ed-drop-zone {
+  min-height: 160px;
+}
+
+.ed-file-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-top: 8px;
+  min-height: 20px;
+  text-align: center;
+}
+
+.ed-sheet-tabs { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; }
+.ed-sheet-tab {
+  padding: 6px 14px; border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm); background: var(--color-surface);
+  cursor: pointer; font-size: 13px; font-family: var(--font-family);
+  transition: all var(--transition);
+}
+.ed-sheet-tab:hover { background: var(--color-surface-hover); }
+.ed-sheet-tab.active {
+  background: var(--color-primary); color: #fff; border-color: var(--color-primary);
+}
+
+.ed-legend {
+  display: flex; gap: 16px; margin-bottom: 8px; font-size: 12px;
+  color: var(--color-text-secondary);
+}
+.ed-legend-item { display: flex; align-items: center; gap: 4px; }
+.ed-legend-swatch { display: inline-block; width: 14px; height: 14px; border-radius: 3px; }
+
+.ed-stats {
+  display: flex; gap: 16px; margin-bottom: 12px; font-size: 13px; font-weight: 600; flex-wrap: wrap;
+}
+.ed-stats-added { color: #1a7f1a; }
+.ed-stats-deleted { color: #c62828; }
+.ed-stats-changed { color: #e65100; }
+
+.ed-table-wrap {
+  max-height: 500px; overflow: auto;
+  border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+}
+
+.ed-table {
+  width: 100%; border-collapse: collapse; font-size: 13px;
+  font-family: 'Consolas', 'Courier New', monospace;
+}
+.ed-table th {
+  position: sticky; top: 0; z-index: 1;
+  background: var(--color-surface); border-bottom: 2px solid var(--color-border);
+  padding: 6px 10px; text-align: left; font-size: 12px; white-space: nowrap;
+}
+.ed-table td {
+  padding: 4px 10px; border-bottom: 1px solid var(--color-border);
+  white-space: pre-wrap; word-break: break-all; position: relative;
+}
+.ed-table tr:hover td { background: var(--color-surface-hover); }
+
+.ed-added { background: #dff6dd !important; }
+.ed-deleted { background: #fde7e9 !important; }
+.ed-changed { background: #fff8e1 !important; }
+
+.ed-table td[title] { cursor: help; }
+
+.ed-row-num {
+  color: var(--color-text-secondary); font-size: 11px;
+  white-space: nowrap; width: 40px; text-align: right;
+}
+
+/* ============================================
+   パスワード生成 (password-gen)
+   ============================================ */
+.pg-output-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+}
+
+.pg-display {
+  flex: 1;
+  font-size: 20px;
+  font-weight: 600;
+  font-family: 'Consolas', 'Courier New', monospace;
+  word-break: break-all;
+  line-height: 1.4;
+  min-height: 30px;
+}
+
+.pg-output-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.pg-strength {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.pg-strength-bar-wrap {
+  flex: 1;
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.pg-strength-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s, background 0.3s;
+  width: 0;
+}
+
+.pg-strength-label {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pg-charsets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  font-size: 13px;
+}
+
+.pg-charsets label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.pg-history {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  margin-top: 16px;
+}
+
+.pg-history-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border);
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  word-break: break-all;
+}
+.pg-history-item:last-child { border-bottom: none; }
+
+.pg-history-text { flex: 1; min-width: 0; }
+
+.pg-history-copy {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--color-primary);
+  font-weight: 600;
+  transition: all var(--transition);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.pg-history-copy:hover { background: var(--color-primary-light); }
+
+/* ============================================
+   カラーピッカー (color-picker)
+   ============================================ */
+.cp-main {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.cp-picker-area {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.cp-color-input {
+  width: 120px;
+  height: 60px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  padding: 2px;
+}
+
+.cp-preview {
+  width: 120px;
+  height: 80px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-4);
+}
+
+.cp-values {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cp-value-row { }
+.cp-value-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.cp-value-input-row .setting-input {
+  flex: 1;
+  max-width: none;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 14px;
+}
+
+.cp-slider-r::-webkit-slider-thumb { background: #ef4444 !important; }
+.cp-slider-g::-webkit-slider-thumb { background: #22c55e !important; }
+.cp-slider-b::-webkit-slider-thumb { background: #3b82f6 !important; }
+
+.cp-section {
+  margin-top: 16px;
+}
+
+.cp-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.cp-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.cp-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--color-border);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.cp-swatch:hover {
+  transform: scale(1.15);
+  box-shadow: var(--shadow-8);
+}
+
+.btn-sm {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+/* ============================================
+   カレンダー (calendar)
+   ============================================ */
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.cal-title {
+  font-size: 18px;
+  font-weight: 700;
+  min-width: 140px;
+  text-align: center;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.cal-weekday-header {
+  padding: 8px 4px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--color-surface);
+  border-bottom: 2px solid var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.cal-weekday-header.cal-sunday { color: #c62828; }
+.cal-weekday-header.cal-saturday { color: #1565c0; }
+
+.cal-day {
+  padding: 8px 4px;
+  min-height: 60px;
+  border-bottom: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: default;
+  position: relative;
+}
+
+.cal-day:nth-child(7n) { border-right: none; }
+
+.cal-day-num {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.cal-day.cal-outside {
+  color: var(--color-text-tertiary);
+  background: var(--color-bg);
+}
+
+.cal-day.cal-today {
+  background: var(--color-primary-light);
+}
+
+.cal-day.cal-today .cal-day-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.cal-day.cal-sunday .cal-day-num { color: #c62828; }
+.cal-day.cal-saturday .cal-day-num { color: #1565c0; }
+.cal-day.cal-holiday .cal-day-num { color: #c62828; }
+
+.cal-holiday-name {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  color: #c62828;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cal-holiday-list {
+  margin-top: 16px;
+  padding: 16px 20px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.cal-holiday-list-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.cal-holiday-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 13px;
+}
+.cal-holiday-list-item:last-child { border-bottom: none; }
+
+.cal-holiday-list-date {
+  font-weight: 600;
+  color: #c62828;
+  min-width: 60px;
+}
+
+.cal-holiday-list-name {
+  color: var(--color-text);
+}
+
 /* レスポンシブ */
 @media (max-width: 768px) {
   .char-count-stats {
@@ -1321,5 +1840,38 @@
   .ie-tool-btn {
     min-width: 40px;
     min-height: 40px;
+  }
+
+  .ed-drop-row {
+    grid-template-columns: 1fr;
+  }
+
+  .cp-main {
+    flex-direction: column;
+  }
+
+  .cp-picker-area {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .pg-output-area {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .cal-day {
+    min-height: 44px;
+    padding: 4px 2px;
+    font-size: 12px;
+  }
+
+  .cal-holiday-name {
+    font-size: 9px;
+  }
+
+  .cal-title {
+    font-size: 15px;
+    min-width: 110px;
   }
 }

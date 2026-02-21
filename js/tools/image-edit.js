@@ -35,6 +35,14 @@
   const fillClearBtn = document.getElementById('ie-fill-clear');
   const strokeClearBtn = document.getElementById('ie-stroke-clear');
 
+  // モザイク・ぼかしプロパティパネル
+  const propMosaic = document.getElementById('ie-prop-mosaic');
+  const propBlur = document.getElementById('ie-prop-blur');
+  const mosaicSizeInput = document.getElementById('ie-mosaic-size');
+  const mosaicSizeVal = document.getElementById('ie-mosaic-size-val');
+  const blurRadiusInput = document.getElementById('ie-blur-radius');
+  const blurRadiusVal = document.getElementById('ie-blur-radius-val');
+
   // クリア（透明）状態
   let fillIsClear = false;
   let strokeIsClear = false;
@@ -160,6 +168,12 @@
     } else if (name === 'select') {
       fc.defaultCursor = 'default';
       updatePropsFromSelection();
+    } else if (name === 'mosaic') {
+      fc.defaultCursor = 'crosshair';
+      showMosaicProps();
+    } else if (name === 'blur') {
+      fc.defaultCursor = 'crosshair';
+      showBlurProps();
     } else {
       fc.defaultCursor = 'crosshair';
       hideAllProps();
@@ -222,7 +236,13 @@
   function onMouseUp() {
     if (!isDrawing) return;
     isDrawing = false;
+    var wasTool = currentTool;
     finalizeTempShape();
+    if (wasTool === 'mosaic' || wasTool === 'blur') {
+      // モザイク・ぼかしは非同期で背景画像を更新するため、
+      // saveState はエフェクト適用関数内で行う。ツールはそのまま維持。
+      return;
+    }
     setTool('select');
     saveState();
   }
@@ -263,6 +283,17 @@
           selectable: false,
         });
         break;
+      case 'mosaic':
+      case 'blur':
+        tempShape = new fabric.Rect({
+          left: x, top: y, width: 0, height: 0,
+          fill: 'rgba(66, 133, 244, 0.2)',
+          stroke: 'rgba(66, 133, 244, 0.8)',
+          strokeWidth: 1,
+          strokeDashArray: [5, 3],
+          selectable: false,
+        });
+        break;
     }
     if (tempShape) fc.add(tempShape);
   }
@@ -288,12 +319,46 @@
       case 'arrow':
         tempShape.set({ x2: x, y2: y });
         break;
+      case 'mosaic':
+      case 'blur':
+        tempShape.set({
+          left: Math.min(startX, x), top: Math.min(startY, y),
+          width: Math.abs(x - startX), height: Math.abs(y - startY),
+        });
+        break;
     }
     fc.renderAll();
   }
 
   function finalizeTempShape() {
     if (!tempShape) return;
+
+    // モザイク・ぼかし: 選択範囲に効果を適用して戻る
+    if (currentTool === 'mosaic' || currentTool === 'blur') {
+      var zoom = fc.getZoom();
+      var left = Math.round(tempShape.left / zoom);
+      var top = Math.round(tempShape.top / zoom);
+      var w = Math.round(tempShape.width / zoom);
+      var h = Math.round(tempShape.height / zoom);
+
+      // 画像範囲にクランプ
+      left = Math.max(0, left);
+      top = Math.max(0, top);
+      w = Math.min(w, originalWidth - left);
+      h = Math.min(h, originalHeight - top);
+
+      fc.remove(tempShape);
+      tempShape = null;
+
+      if (w > 2 && h > 2) {
+        if (currentTool === 'mosaic') {
+          applyMosaicToRegion(left, top, w, h, parseInt(mosaicSizeInput.value, 10) || 10);
+        } else {
+          applyBlurToRegion(left, top, w, h, parseInt(blurRadiusInput.value, 10) || 5);
+        }
+      }
+      return;
+    }
 
     if (currentTool === 'arrow') {
       var x1 = tempShape.x1, y1 = tempShape.y1;
@@ -372,6 +437,92 @@
     saveState();
   }
 
+  // --- モザイク適用 ---
+  function applyMosaicToRegion(left, top, width, height, blockSize) {
+    var bgImg = fc.backgroundImage;
+    if (!bgImg) return;
+
+    var offCanvas = document.createElement('canvas');
+    offCanvas.width = originalWidth;
+    offCanvas.height = originalHeight;
+    var offCtx = offCanvas.getContext('2d');
+
+    // 現在の背景を描画
+    var bgElement = bgImg.getElement();
+    offCtx.drawImage(bgElement, 0, 0, originalWidth, originalHeight);
+
+    // 選択領域にモザイクを適用
+    var imageData = offCtx.getImageData(left, top, width, height);
+    var data = imageData.data;
+
+    for (var y = 0; y < height; y += blockSize) {
+      for (var x = 0; x < width; x += blockSize) {
+        var bw = Math.min(blockSize, width - x);
+        var bh = Math.min(blockSize, height - y);
+
+        // ブロック内の平均色を計算
+        var r = 0, g = 0, b = 0, count = 0;
+        for (var by = 0; by < bh; by++) {
+          for (var bx = 0; bx < bw; bx++) {
+            var idx = ((y + by) * width + (x + bx)) * 4;
+            r += data[idx]; g += data[idx+1]; b += data[idx+2];
+            count++;
+          }
+        }
+        r = Math.round(r / count);
+        g = Math.round(g / count);
+        b = Math.round(b / count);
+
+        // ブロックを平均色で塗りつぶし
+        for (var by = 0; by < bh; by++) {
+          for (var bx = 0; bx < bw; bx++) {
+            var idx = ((y + by) * width + (x + bx)) * 4;
+            data[idx] = r; data[idx+1] = g; data[idx+2] = b;
+          }
+        }
+      }
+    }
+
+    offCtx.putImageData(imageData, left, top);
+
+    // 新しい背景として設定
+    var newDataURL = offCanvas.toDataURL('image/png');
+    fc.setBackgroundImage(newDataURL, function () {
+      fc.renderAll();
+      saveState();
+    }, { originX: 'left', originY: 'top', scaleX: 1, scaleY: 1 });
+  }
+
+  // --- ぼかし適用 ---
+  function applyBlurToRegion(left, top, width, height, radius) {
+    var bgImg = fc.backgroundImage;
+    if (!bgImg) return;
+
+    var offCanvas = document.createElement('canvas');
+    offCanvas.width = originalWidth;
+    offCanvas.height = originalHeight;
+    var offCtx = offCanvas.getContext('2d');
+
+    var bgElement = bgImg.getElement();
+    offCtx.drawImage(bgElement, 0, 0, originalWidth, originalHeight);
+
+    // Canvas filter でぼかしを適用
+    var regionCanvas = document.createElement('canvas');
+    regionCanvas.width = width;
+    regionCanvas.height = height;
+    var regionCtx = regionCanvas.getContext('2d');
+    regionCtx.filter = 'blur(' + radius + 'px)';
+    regionCtx.drawImage(offCanvas, left, top, width, height, 0, 0, width, height);
+
+    offCtx.drawImage(regionCanvas, left, top);
+
+    var newDataURL = offCanvas.toDataURL('image/png');
+    fc.setBackgroundImage(newDataURL, function () {
+      fc.renderAll();
+      saveState();
+    }, { originX: 'left', originY: 'top', scaleX: 1, scaleY: 1 });
+  }
+
   // --- ダブルクリック → コメント編集 ---
   function onDblClick(opt) {
     var target = opt.target;
@@ -445,6 +596,8 @@
     propCommon.style.display = 'none';
     propText.style.display = 'none';
     propPen.style.display = 'none';
+    propMosaic.style.display = 'none';
+    propBlur.style.display = 'none';
   }
 
   function showPenProps() {
@@ -452,6 +605,26 @@
     propCommon.style.display = 'none';
     propText.style.display = 'none';
     propPen.style.display = '';
+    propMosaic.style.display = 'none';
+    propBlur.style.display = 'none';
+  }
+
+  function showMosaicProps() {
+    propEmpty.style.display = 'none';
+    propCommon.style.display = 'none';
+    propText.style.display = 'none';
+    propPen.style.display = 'none';
+    propMosaic.style.display = '';
+    propBlur.style.display = 'none';
+  }
+
+  function showBlurProps() {
+    propEmpty.style.display = 'none';
+    propCommon.style.display = 'none';
+    propText.style.display = 'none';
+    propPen.style.display = 'none';
+    propMosaic.style.display = 'none';
+    propBlur.style.display = '';
   }
 
   function onSelectionChange() {
@@ -461,6 +634,10 @@
   function onSelectionCleared() {
     if (currentTool === 'pen') {
       showPenProps();
+    } else if (currentTool === 'mosaic') {
+      showMosaicProps();
+    } else if (currentTool === 'blur') {
+      showBlurProps();
     } else {
       hideAllProps();
     }
@@ -601,6 +778,15 @@
   penWidthInput.addEventListener('input', function () {
     penWidthVal.textContent = penWidthInput.value + 'px';
     if (fc && fc.freeDrawingBrush) fc.freeDrawingBrush.width = parseInt(penWidthInput.value, 10);
+  });
+
+  // モザイク・ぼかし設定
+  mosaicSizeInput.addEventListener('input', function () {
+    mosaicSizeVal.textContent = mosaicSizeInput.value + 'px';
+  });
+
+  blurRadiusInput.addEventListener('input', function () {
+    blurRadiusVal.textContent = blurRadiusInput.value + 'px';
   });
 
   // --- Undo / Redo ---
