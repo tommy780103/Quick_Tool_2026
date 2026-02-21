@@ -190,4 +190,19 @@
     div.textContent = str;
     return div.innerHTML;
   }
+  // --- リセット ---
+  document.getElementById('ps-reset').addEventListener('click', () => {
+    srcBuffer = null;
+    srcFileName = '';
+    totalPages = 0;
+    results = [];
+    resultList.innerHTML = '';
+    settingsPanel.style.display = 'none';
+    resultArea.style.display = 'none';
+    previewArea.style.display = 'none';
+    previewArea.innerHTML = '';
+    activePreviewIdx = -1;
+    totalDisplay.textContent = '-';
+    document.getElementById('ps-file').value = '';
+  });
 })();

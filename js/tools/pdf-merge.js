@@ -319,4 +319,16 @@
     div.textContent = str;
     return div.innerHTML;
   }
+  // --- リセット ---
+  document.getElementById('pm-reset').addEventListener('click', () => {
+    sourceFiles = [];
+    resultBlob = null;
+    fileList.innerHTML = '';
+    settingsPanel.style.display = 'none';
+    resultArea.style.display = 'none';
+    document.getElementById('pm-preview').innerHTML = '';
+    document.getElementById('pm-preview').style.display = 'none';
+    resultInfo.textContent = '';
+    document.getElementById('pm-file').value = '';
+  });
 })();

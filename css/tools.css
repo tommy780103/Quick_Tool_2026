@@ -795,4 +795,32 @@
   .ie-canvas-container {
     min-height: 300px;
   }
+
+  /* 画像エディタ：横画面推奨ヒント */
+  .ie-editor::before {
+    content: '横画面での使用を推奨します';
+    display: block;
+    text-align: center;
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    padding: 8px;
+    background: var(--color-bg);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+  }
+
+  .ie-action-bar {
+    gap: 4px;
+    padding: 6px 8px;
+  }
+
+  .ie-action-btn {
+    min-height: 36px;
+    min-width: 36px;
+  }
+
+  .ie-tool-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
 }

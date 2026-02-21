@@ -213,4 +213,12 @@
     return btn;
   }
 
+  // --- リセット ---
+  document.getElementById('ic-reset').addEventListener('click', () => {
+    results = [];
+    resultList.innerHTML = '';
+    resultArea.style.display = 'none';
+    document.getElementById('ic-file').value = '';
+  });
+
 })();

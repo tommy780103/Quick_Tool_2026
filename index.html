@@ -9,20 +9,34 @@
   <link rel="stylesheet" href="css/tools.css">
 </head>
 <body>
+  <!-- スキップリンク -->
+  <a class="skip-link" href="#main">メインコンテンツへ</a>
+
   <!-- ヘッダー -->
   <header class="header">
     <button class="header-menu-btn" id="menuToggle" aria-label="メニュー切替">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><rect y="3" width="20" height="2" rx="1"/><rect y="9" width="20" height="2" rx="1"/><rect y="15" width="20" height="2" rx="1"/></svg>
     </button>
-    <h1 class="header-title">ちょいツール</h1>
-    <span class="header-badge">全処理ブラウザ内完結</span>
+    <a class="header-title-link" href="#home" id="headerTitleLink">
+      <h1 class="header-title">ちょいツール</h1>
+    </a>
+    <span class="header-badge">
+      <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-1px;margin-right:4px"><path d="M10 1a4 4 0 00-4 4v3H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-1V5a4 4 0 00-4-4zm2 7V5a2 2 0 10-4 0v3h4z"/></svg>
+      全処理ブラウザ内完結
+    </span>
   </header>
 
   <div class="layout">
     <!-- サイドバー -->
-    <nav class="sidebar" id="sidebar">
+    <nav class="sidebar" id="sidebar" aria-label="ツールナビゲーション">
       <div class="sidebar-group">
-        <div class="sidebar-category">画像</div>
+        <a class="sidebar-item sidebar-home" href="#home" data-tool="home">
+          <svg class="sidebar-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2.5l-7 6V17a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1V8.5l-7-6z"/></svg>
+          ホーム
+        </a>
+      </div>
+      <div class="sidebar-group">
+        <div class="sidebar-category">画像 <span class="sidebar-count">4</span></div>
         <a class="sidebar-item" href="#image-convert" data-tool="image-convert">
           <svg class="sidebar-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 1.5h12a.5.5 0 01.5.5v6.8l-3.15-3.15a.75.75 0 00-1.06 0L8.5 12.44l-1.72-1.72a.75.75 0 00-1.06 0L3.5 12.94V5a.5.5 0 01.5-.5zM7 6.75a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0z"/></svg>
           フォーマット変換
@@ -41,7 +55,7 @@
         </a>
       </div>
       <div class="sidebar-group">
-        <div class="sidebar-category">PDF</div>
+        <div class="sidebar-category">PDF <span class="sidebar-count">4</span></div>
         <a class="sidebar-item" href="#pdf-merge" data-tool="pdf-merge">
           <svg class="sidebar-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M5.5 3A1.5 1.5 0 004 4.5v11A1.5 1.5 0 005.5 17h5.585a1.5 1.5 0 00-.085-.5V16H5.5a.5.5 0 01-.5-.5v-11a.5.5 0 01.5-.5h6v3.5A1.5 1.5 0 0013 9h3v2h1V8.621a1.5 1.5 0 00-.44-1.06l-3.12-3.122A1.5 1.5 0 0012.378 4H5.5z"/><path d="M14 13.5a.5.5 0 00-1 0V16h-2.5a.5.5 0 000 1H13v2.5a.5.5 0 001 0V17h2.5a.5.5 0 000-1H14v-2.5z"/></svg>
           結合（Excel対応）
@@ -60,7 +74,7 @@
         </a>
       </div>
       <div class="sidebar-group">
-        <div class="sidebar-category">テキスト</div>
+        <div class="sidebar-category">テキスト <span class="sidebar-count">4</span></div>
         <a class="sidebar-item" href="#qr-generate" data-tool="qr-generate">
           <svg class="sidebar-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 5a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm2-.5a.5.5 0 00-.5.5v3a.5.5 0 00.5.5h3a.5.5 0 00.5-.5V5a.5.5 0 00-.5-.5H5zM6 6h1v1H6V6zm-3 6a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-3zm2-.5a.5.5 0 00-.5.5v3a.5.5 0 00.5.5h3a.5.5 0 00.5-.5v-3a.5.5 0 00-.5-.5H5zm1 1.5h1v1H6v-1zM12 3a2 2 0 00-2 2v3a2 2 0 002 2h3a2 2 0 002-2V5a2 2 0 00-2-2h-3zm-.5 2a.5.5 0 01.5-.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5h-3a.5.5 0 01-.5-.5V5zm1.5 1h1v1h-1V6zm-2 6.5a.5.5 0 01.5-.5h1a.5.5 0 010 1h-1a.5.5 0 01-.5-.5zm4 0a.5.5 0 01.5-.5h1.5v1.5a.5.5 0 01-1 0V13h-.5a.5.5 0 01-.5-.5zM11 15a1 1 0 011-1h1v1a1 1 0 01-1 1h-1v1h2.5a.5.5 0 010 1H11v-3zm5-1h1a1 1 0 011 1v2a1 1 0 01-1 1h-1a1 1 0 01-1-1v-2a1 1 0 011-1z"/></svg>
           QRコード生成
@@ -84,18 +98,104 @@
       </div>
     </nav>
 
+    <!-- モバイルオーバーレイ -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <!-- メインコンテンツ -->
     <main class="main" id="main">
+      <!-- ホーム画面 -->
+      <section class="tool-panel" id="tool-home">
+        <div class="home-hero">
+          <h2 class="home-title" tabindex="-1">ようこそ！ちょいツールへ</h2>
+          <p class="home-subtitle">社内向けブラウザ完結型ツール集です。<br>ファイルはサーバーに送信されず、すべてブラウザ内で処理されます。</p>
+        </div>
+        <div class="home-categories">
+          <div class="home-category">
+            <h3 class="home-category-title">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 1.5h12a.5.5 0 01.5.5v6.8l-3.15-3.15a.75.75 0 00-1.06 0L8.5 12.44l-1.72-1.72a.75.75 0 00-1.06 0L3.5 12.94V5a.5.5 0 01.5-.5zM7 6.75a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0z"/></svg>
+              画像
+            </h3>
+            <div class="home-cards">
+              <a class="home-card" href="#image-convert" data-tool="image-convert">
+                <div class="home-card-title">フォーマット変換</div>
+                <div class="home-card-desc">PNG, JPG, WebP, BMP 間でフォーマットを変換</div>
+              </a>
+              <a class="home-card" href="#image-compress" data-tool="image-compress">
+                <div class="home-card-title">圧縮</div>
+                <div class="home-card-desc">画像のファイルサイズを削減</div>
+              </a>
+              <a class="home-card" href="#image-resize" data-tool="image-resize">
+                <div class="home-card-title">リサイズ</div>
+                <div class="home-card-desc">幅×高さを px / % で変更</div>
+              </a>
+              <a class="home-card" href="#image-edit" data-tool="image-edit">
+                <div class="home-card-title">編集</div>
+                <div class="home-card-desc">図形・テキスト・矢印を追加</div>
+              </a>
+            </div>
+          </div>
+          <div class="home-category">
+            <h3 class="home-category-title">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M5.5 3A1.5 1.5 0 004 4.5v11A1.5 1.5 0 005.5 17h9a1.5 1.5 0 001.5-1.5V8.621a1.5 1.5 0 00-.44-1.06l-3.12-3.122A1.5 1.5 0 0012.378 4H5.5z"/></svg>
+              PDF
+            </h3>
+            <div class="home-cards">
+              <a class="home-card" href="#pdf-merge" data-tool="pdf-merge">
+                <div class="home-card-title">結合（Excel対応）</div>
+                <div class="home-card-desc">PDF・Excelを1つのPDFに結合</div>
+              </a>
+              <a class="home-card" href="#pdf-split" data-tool="pdf-split">
+                <div class="home-card-title">分割</div>
+                <div class="home-card-desc">ページ単位でPDFを分割</div>
+              </a>
+              <a class="home-card" href="#pdf-to-image" data-tool="pdf-to-image">
+                <div class="home-card-title">PDF → 画像</div>
+                <div class="home-card-desc">各ページを画像に変換</div>
+              </a>
+              <a class="home-card" href="#image-to-pdf" data-tool="image-to-pdf">
+                <div class="home-card-title">画像 → PDF</div>
+                <div class="home-card-desc">複数画像を1つのPDFに</div>
+              </a>
+            </div>
+          </div>
+          <div class="home-category">
+            <h3 class="home-category-title">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4.5A1.5 1.5 0 014.5 3h11A1.5 1.5 0 0117 4.5v11a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 013 15.5v-11zM4.5 4a.5.5 0 00-.5.5v11a.5.5 0 00.5.5h11a.5.5 0 00.5-.5v-11a.5.5 0 00-.5-.5h-11z"/><path d="M7 7h6v1H7V7zm0 3h6v1H7v-1zm0 3h4v1H7v-1z"/></svg>
+              テキスト
+            </h3>
+            <div class="home-cards">
+              <a class="home-card" href="#qr-generate" data-tool="qr-generate">
+                <div class="home-card-title">QRコード生成</div>
+                <div class="home-card-desc">テキスト・URLからQRコード作成</div>
+              </a>
+              <a class="home-card" href="#char-count" data-tool="char-count">
+                <div class="home-card-title">文字数カウント</div>
+                <div class="home-card-desc">文字数・バイト数・行数を表示</div>
+              </a>
+              <a class="home-card" href="#text-diff" data-tool="text-diff">
+                <div class="home-card-title">テキスト差分</div>
+                <div class="home-card-desc">2つのテキストの差分を比較</div>
+              </a>
+              <a class="home-card" href="#url-shorten" data-tool="url-shorten">
+                <div class="home-card-title">URL短縮</div>
+                <div class="home-card-desc">長いURLを短縮URLに変換</div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- 画像フォーマット変換 -->
       <section class="tool-panel" id="tool-image-convert">
         <div class="tool-header">
-          <h2 class="tool-title">画像フォーマット変換</h2>
+          <h2 class="tool-title" tabindex="-1">画像フォーマット変換</h2>
           <p class="tool-description">PNG, JPG, WebP, BMP, GIF, HEIC 間でフォーマットを変換します</p>
         </div>
         <div class="drop-zone" id="ic-drop">
           <svg class="drop-zone-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="36" height="36" rx="4"/><circle cx="18" cy="18" r="4"/><path d="M6 34l10-10 8 8 6-6 12 12"/></svg>
           <p class="drop-zone-text">画像をドラッグ＆ドロップ</p>
           <p class="drop-zone-hint">または クリックして選択（複数可）</p>
+          <div class="drop-zone-formats"><span class="format-badge">PNG</span><span class="format-badge">JPG</span><span class="format-badge">WebP</span><span class="format-badge">BMP</span><span class="format-badge">GIF</span><span class="format-badge">HEIC</span></div>
           <input type="file" class="drop-zone-input" id="ic-file" accept="image/*,.heic,.heif" multiple>
         </div>
         <div class="tool-settings">
@@ -115,20 +215,24 @@
         </div>
         <div class="tool-result" id="ic-result" style="display:none">
           <div class="result-list" id="ic-list"></div>
-          <button class="btn btn-primary" id="ic-download-all">すべてダウンロード</button>
+          <div class="result-actions">
+            <button class="btn btn-primary" id="ic-download-all">すべてダウンロード</button>
+            <button class="btn btn-secondary btn-reset" id="ic-reset">別のファイルで実行</button>
+          </div>
         </div>
       </section>
 
       <!-- 画像圧縮 -->
       <section class="tool-panel" id="tool-image-compress">
         <div class="tool-header">
-          <h2 class="tool-title">画像圧縮</h2>
+          <h2 class="tool-title" tabindex="-1">画像圧縮</h2>
           <p class="tool-description">画像の品質を調整してファイルサイズを削減します</p>
         </div>
         <div class="drop-zone" id="icomp-drop">
           <svg class="drop-zone-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="36" height="36" rx="4"/><path d="M14 34V24l6 6 4-4 10 8"/><circle cx="32" cy="16" r="4"/></svg>
           <p class="drop-zone-text">画像をドラッグ＆ドロップ</p>
           <p class="drop-zone-hint">または クリックして選択（複数可）</p>
+          <div class="drop-zone-formats"><span class="format-badge">PNG</span><span class="format-badge">JPG</span><span class="format-badge">WebP</span><span class="format-badge">HEIC</span></div>
           <input type="file" class="drop-zone-input" id="icomp-file" accept="image/*,.heic,.heif" multiple>
         </div>
         <div class="tool-settings">
@@ -147,20 +251,24 @@
         </div>
         <div class="tool-result" id="icomp-result" style="display:none">
           <div class="result-list" id="icomp-list"></div>
-          <button class="btn btn-primary" id="icomp-download-all">すべてダウンロード</button>
+          <div class="result-actions">
+            <button class="btn btn-primary" id="icomp-download-all">すべてダウンロード</button>
+            <button class="btn btn-secondary btn-reset" id="icomp-reset">別のファイルで実行</button>
+          </div>
         </div>
       </section>
 
       <!-- 画像リサイズ -->
       <section class="tool-panel" id="tool-image-resize">
         <div class="tool-header">
-          <h2 class="tool-title">画像リサイズ</h2>
+          <h2 class="tool-title" tabindex="-1">画像リサイズ</h2>
           <p class="tool-description">画像のサイズを変更します（px / % 指定）</p>
         </div>
         <div class="drop-zone" id="ir-drop">
           <svg class="drop-zone-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="32" height="32" rx="4"/><path d="M8 28h32M20 8v32"/></svg>
           <p class="drop-zone-text">画像をドラッグ＆ドロップ</p>
           <p class="drop-zone-hint">または クリックして選択</p>
+          <div class="drop-zone-formats"><span class="format-badge">PNG</span><span class="format-badge">JPG</span><span class="format-badge">WebP</span><span class="format-badge">HEIC</span></div>
           <input type="file" class="drop-zone-input" id="ir-file" accept="image/*,.heic,.heif">
         </div>
         <div class="tool-settings" id="ir-settings" style="display:none">
@@ -203,29 +311,33 @@
         <div class="tool-result" id="ir-result" style="display:none">
           <div class="result-preview" id="ir-preview"></div>
           <div class="result-info" id="ir-info"></div>
-          <button class="btn btn-primary" id="ir-download">ダウンロード</button>
+          <div class="result-actions">
+            <button class="btn btn-primary" id="ir-download">ダウンロード</button>
+            <button class="btn btn-secondary btn-reset" id="ir-reset">別のファイルで実行</button>
+          </div>
         </div>
       </section>
 
       <!-- 画像編集 -->
       <section class="tool-panel" id="tool-image-edit">
         <div class="tool-header">
-          <h2 class="tool-title">画像編集</h2>
+          <h2 class="tool-title" tabindex="-1">画像編集</h2>
           <p class="tool-description">画像に図形・テキスト・矢印・コメントを追加して編集します</p>
         </div>
         <div class="drop-zone" id="ie-drop">
           <svg class="drop-zone-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="36" height="36" rx="4"/><path d="M16 24h16M24 16v16"/></svg>
           <p class="drop-zone-text">編集する画像をドラッグ＆ドロップ</p>
           <p class="drop-zone-hint">または クリックして選択</p>
+          <div class="drop-zone-formats"><span class="format-badge">PNG</span><span class="format-badge">JPG</span><span class="format-badge">WebP</span><span class="format-badge">HEIC</span></div>
           <input type="file" class="drop-zone-input" id="ie-file" accept="image/*,.heic,.heif">
         </div>
         <div class="ie-editor" id="ie-editor" style="display:none">
           <div class="ie-action-bar">
             <div class="ie-action-group">
-              <button class="ie-action-btn" id="ie-undo" title="元に戻す (Ctrl+Z)" disabled>
+              <button class="ie-action-btn" id="ie-undo" title="元に戻す (Ctrl+Z)" aria-label="元に戻す" disabled>
                 <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path d="M7.85 4.15a.5.5 0 00-.7 0l-3.5 3.5a.5.5 0 000 .7l3.5 3.5a.5.5 0 00.7-.7L5.21 8.5H12a3.5 3.5 0 010 7H8.5a.5.5 0 000 1H12a4.5 4.5 0 000-9H5.21l2.64-2.65a.5.5 0 000-.7z"/></svg>
               </button>
-              <button class="ie-action-btn" id="ie-redo" title="やり直し (Ctrl+Y)" disabled>
+              <button class="ie-action-btn" id="ie-redo" title="やり直し (Ctrl+Y)" aria-label="やり直し" disabled>
                 <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path d="M12.15 4.15a.5.5 0 01.7 0l3.5 3.5a.5.5 0 010 .7l-3.5 3.5a.5.5 0 01-.7-.7L14.79 8.5H8a3.5 3.5 0 000 7h3.5a.5.5 0 010 1H8a4.5 4.5 0 010-9h6.79l-2.64-2.65a.5.5 0 010-.7z"/></svg>
               </button>
             </div>
@@ -333,13 +445,14 @@
       <!-- PDF結合 -->
       <section class="tool-panel" id="tool-pdf-merge">
         <div class="tool-header">
-          <h2 class="tool-title">ファイル結合（PDF / Excel）</h2>
+          <h2 class="tool-title" tabindex="-1">ファイル結合（PDF / Excel）</h2>
           <p class="tool-description">PDF・Excelファイルを1つのPDFに結合します（Excelは自動でPDFに変換）</p>
         </div>
         <div class="drop-zone" id="pm-drop">
           <svg class="drop-zone-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="4" width="24" height="32" rx="2"/><rect x="16" y="12" width="24" height="32" rx="2"/><path d="M28 32v-8m-4 4h8"/></svg>
           <p class="drop-zone-text">PDF / Excel をドラッグ＆ドロップ</p>
           <p class="drop-zone-hint">または クリックして選択（複数可・混在OK）</p>
+          <div class="drop-zone-formats"><span class="format-badge">PDF</span><span class="format-badge">XLSX</span><span class="format-badge">XLS</span></div>
           <input type="file" class="drop-zone-input" id="pm-file" accept=".pdf,.xlsx,.xls" multiple>
         </div>
         <div class="tool-settings" id="pm-settings" style="display:none">
@@ -350,20 +463,24 @@
         <div class="tool-result" id="pm-result" style="display:none">
           <div class="pdf-preview" id="pm-preview" style="display:none"></div>
           <div class="result-info" id="pm-info"></div>
-          <button class="btn btn-primary" id="pm-download">ダウンロード</button>
+          <div class="result-actions">
+            <button class="btn btn-primary" id="pm-download">ダウンロード</button>
+            <button class="btn btn-secondary btn-reset" id="pm-reset">別のファイルで実行</button>
+          </div>
         </div>
       </section>
 
       <!-- PDF分割 -->
       <section class="tool-panel" id="tool-pdf-split">
         <div class="tool-header">
-          <h2 class="tool-title">PDF分割</h2>
+          <h2 class="tool-title" tabindex="-1">PDF分割</h2>
           <p class="tool-description">PDFをページ単位で分割します</p>
         </div>
         <div class="drop-zone" id="ps-drop">
           <svg class="drop-zone-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="20" height="28" rx="2"/><rect x="22" y="14" width="20" height="28" rx="2"/><path d="M32 6v8m-4-4h8"/></svg>
           <p class="drop-zone-text">PDFをドラッグ＆ドロップ</p>
           <p class="drop-zone-hint">または クリックして選択</p>
+          <div class="drop-zone-formats"><span class="format-badge">PDF</span></div>
           <input type="file" class="drop-zone-input" id="ps-file" accept=".pdf">
         </div>
         <div class="tool-settings" id="ps-settings" style="display:none">
@@ -391,20 +508,24 @@
         <div class="tool-result" id="ps-result" style="display:none">
           <div class="result-list" id="ps-list"></div>
           <div class="pdf-preview" id="ps-preview" style="display:none"></div>
-          <button class="btn btn-primary" id="ps-download-all">すべてダウンロード</button>
+          <div class="result-actions">
+            <button class="btn btn-primary" id="ps-download-all">すべてダウンロード</button>
+            <button class="btn btn-secondary btn-reset" id="ps-reset">別のファイルで実行</button>
+          </div>
         </div>
       </section>
 
       <!-- PDF→画像 -->
       <section class="tool-panel" id="tool-pdf-to-image">
         <div class="tool-header">
-          <h2 class="tool-title">PDF → 画像変換</h2>
+          <h2 class="tool-title" tabindex="-1">PDF → 画像変換</h2>
           <p class="tool-description">PDFの各ページを画像に変換します</p>
         </div>
         <div class="drop-zone" id="p2i-drop">
           <svg class="drop-zone-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="16" height="22" rx="2"/><path d="M26 18l16-12v36L26 28z"/><rect x="26" y="22" width="16" height="20" rx="2"/></svg>
           <p class="drop-zone-text">PDFをドラッグ＆ドロップ</p>
           <p class="drop-zone-hint">または クリックして選択</p>
+          <div class="drop-zone-formats"><span class="format-badge">PDF</span></div>
           <input type="file" class="drop-zone-input" id="p2i-file" accept=".pdf">
         </div>
         <div class="tool-settings">
@@ -430,20 +551,24 @@
         </div>
         <div class="tool-result" id="p2i-result" style="display:none">
           <div class="result-grid" id="p2i-grid"></div>
-          <button class="btn btn-primary" id="p2i-download-all">すべてダウンロード</button>
+          <div class="result-actions">
+            <button class="btn btn-primary" id="p2i-download-all">すべてダウンロード</button>
+            <button class="btn btn-secondary btn-reset" id="p2i-reset">別のファイルで実行</button>
+          </div>
         </div>
       </section>
 
       <!-- 画像→PDF -->
       <section class="tool-panel" id="tool-image-to-pdf">
         <div class="tool-header">
-          <h2 class="tool-title">画像 → PDF変換</h2>
+          <h2 class="tool-title" tabindex="-1">画像 → PDF変換</h2>
           <p class="tool-description">複数の画像を1つのPDFにまとめます</p>
         </div>
         <div class="drop-zone" id="i2p-drop">
           <svg class="drop-zone-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="36" height="36" rx="4"/><circle cx="18" cy="18" r="4"/><path d="M6 34l10-10 8 8 6-6 12 12"/></svg>
           <p class="drop-zone-text">画像をドラッグ＆ドロップ</p>
           <p class="drop-zone-hint">または クリックして選択（複数可）</p>
+          <div class="drop-zone-formats"><span class="format-badge">PNG</span><span class="format-badge">JPG</span><span class="format-badge">WebP</span><span class="format-badge">GIF</span></div>
           <input type="file" class="drop-zone-input" id="i2p-file" accept="image/*" multiple>
         </div>
         <div class="tool-settings" id="i2p-settings" style="display:none">
@@ -467,14 +592,17 @@
         <div class="tool-result" id="i2p-result" style="display:none">
           <div class="pdf-preview" id="i2p-preview" style="display:none"></div>
           <div class="result-info" id="i2p-info"></div>
-          <button class="btn btn-primary" id="i2p-download">ダウンロード</button>
+          <div class="result-actions">
+            <button class="btn btn-primary" id="i2p-download">ダウンロード</button>
+            <button class="btn btn-secondary btn-reset" id="i2p-reset">別のファイルで実行</button>
+          </div>
         </div>
       </section>
 
       <!-- QRコード生成 -->
       <section class="tool-panel" id="tool-qr-generate">
         <div class="tool-header">
-          <h2 class="tool-title">QRコード生成</h2>
+          <h2 class="tool-title" tabindex="-1">QRコード生成</h2>
           <p class="tool-description">テキストやURLからQRコードを生成します</p>
         </div>
         <div class="tool-settings">
@@ -509,7 +637,7 @@
       <!-- 文字数カウント -->
       <section class="tool-panel" id="tool-char-count">
         <div class="tool-header">
-          <h2 class="tool-title">文字数カウント</h2>
+          <h2 class="tool-title" tabindex="-1">文字数カウント</h2>
           <p class="tool-description">文字数・バイト数・行数をリアルタイムで表示します</p>
         </div>
         <div class="tool-settings">
@@ -554,7 +682,7 @@
       <!-- テキスト差分 -->
       <section class="tool-panel" id="tool-text-diff">
         <div class="tool-header">
-          <h2 class="tool-title">テキスト差分比較</h2>
+          <h2 class="tool-title" tabindex="-1">テキスト差分比較</h2>
           <p class="tool-description">2つのテキストの差分を色分け表示します</p>
         </div>
         <div class="diff-inputs">
@@ -596,7 +724,7 @@
       <!-- URL短縮 -->
       <section class="tool-panel" id="tool-url-shorten">
         <div class="tool-header">
-          <h2 class="tool-title">URL短縮</h2>
+          <h2 class="tool-title" tabindex="-1">URL短縮</h2>
           <p class="tool-description">長いURLを短縮URLに変換します</p>
         </div>
         <div class="tool-settings">
@@ -630,7 +758,7 @@
   </div>
 
   <!-- トースト通知 -->
-  <div class="toast-container" id="toast-container"></div>
+  <div class="toast-container" id="toast-container" aria-live="assertive" role="alert"></div>
 
   <!-- スクリプト -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>

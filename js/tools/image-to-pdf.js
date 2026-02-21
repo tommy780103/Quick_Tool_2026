@@ -186,4 +186,16 @@
     div.textContent = str;
     return div.innerHTML;
   }
+  // --- リセット ---
+  document.getElementById('i2p-reset').addEventListener('click', () => {
+    imageFiles = [];
+    resultBlob = null;
+    fileList.innerHTML = '';
+    settingsPanel.style.display = 'none';
+    resultArea.style.display = 'none';
+    document.getElementById('i2p-preview').innerHTML = '';
+    document.getElementById('i2p-preview').style.display = 'none';
+    resultInfo.textContent = '';
+    document.getElementById('i2p-file').value = '';
+  });
 })();

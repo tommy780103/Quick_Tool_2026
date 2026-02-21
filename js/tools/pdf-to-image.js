@@ -102,4 +102,12 @@
   downloadAllBtn.addEventListener('click', () => {
     results.forEach((r) => ChoiTool.downloadBlob(r.blob, r.name));
   });
+  // --- リセット ---
+  document.getElementById('p2i-reset').addEventListener('click', () => {
+    results = [];
+    resultGrid.innerHTML = '';
+    resultArea.style.display = 'none';
+    progressArea.style.display = 'none';
+    document.getElementById('p2i-file').value = '';
+  });
 })();

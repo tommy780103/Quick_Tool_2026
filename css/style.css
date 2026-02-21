@@ -17,7 +17,7 @@
   --color-border: #e1dfdd;
   --color-text: #323130;
   --color-text-secondary: #605e5c;
-  --color-text-tertiary: #a19f9d;
+  --color-text-tertiary: #8a8886;
   --color-header: #0078d4;
   --color-sidebar-bg: #faf9f8;
   --color-sidebar-hover: #edebe9;
@@ -50,7 +50,33 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ヘッダー */
+/* ============================================
+   スキップリンク（アクセシビリティ）
+   ============================================ */
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 1000;
+  padding: 8px 16px;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 8px;
+}
+
+/* ============================================
+   ヘッダー
+   ============================================ */
+
 .header {
   position: fixed;
   top: 0;
@@ -77,10 +103,27 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
   transition: background var(--transition);
 }
 
 .header-menu-btn:hover {
+  background: rgba(255,255,255,0.15);
+}
+
+.header-title-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  margin: -4px -8px;
+  transition: background var(--transition);
+}
+
+.header-title-link:hover {
   background: rgba(255,255,255,0.15);
 }
 
@@ -97,16 +140,24 @@ html, body {
   padding: 3px 10px;
   border-radius: 12px;
   font-weight: 500;
+  display: inline-flex;
+  align-items: center;
 }
 
-/* レイアウト */
+/* ============================================
+   レイアウト
+   ============================================ */
+
 .layout {
   display: flex;
   margin-top: var(--header-height);
   min-height: calc(100vh - var(--header-height));
 }
 
-/* サイドバー */
+/* ============================================
+   サイドバー
+   ============================================ */
+
 .sidebar {
   width: var(--sidebar-width);
   min-width: var(--sidebar-width);
@@ -136,6 +187,20 @@ html, body {
   color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sidebar-count {
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--color-border);
+  color: var(--color-text-secondary);
+  padding: 1px 6px;
+  border-radius: 8px;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .sidebar-item {
@@ -149,6 +214,7 @@ html, body {
   transition: background var(--transition);
   cursor: pointer;
   border-left: 3px solid transparent;
+  min-height: 40px;
 }
 
 .sidebar-item:hover {
@@ -160,6 +226,13 @@ html, body {
   color: var(--color-primary);
   font-weight: 600;
   border-left-color: var(--color-primary);
+}
+
+.sidebar-home {
+  font-weight: 600;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 4px;
+  padding-bottom: 10px;
 }
 
 .sidebar-icon {
@@ -179,7 +252,26 @@ html, body {
   border-top: 1px solid var(--color-border);
 }
 
-/* メインコンテンツ */
+/* モバイルオーバーレイ */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 40;
+}
+
+.sidebar-overlay.active {
+  display: block;
+}
+
+/* ============================================
+   メインコンテンツ
+   ============================================ */
+
 .main {
   flex: 1;
   padding: 24px;
@@ -187,7 +279,96 @@ html, body {
   min-width: 0;
 }
 
-/* ツールパネル */
+/* ============================================
+   ホーム画面
+   ============================================ */
+
+.home-hero {
+  text-align: center;
+  padding: 32px 16px 40px;
+}
+
+.home-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 8px;
+  outline: none;
+}
+
+.home-subtitle {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}
+
+.home-categories {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.home-category {
+  margin-bottom: 32px;
+}
+
+.home-category-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 4px;
+}
+
+.home-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.home-card {
+  display: block;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  text-decoration: none;
+  color: var(--color-text);
+  transition: all var(--transition);
+  box-shadow: var(--shadow-4);
+  cursor: pointer;
+  min-height: 100px;
+}
+
+.home-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-8);
+  transform: translateY(-2px);
+}
+
+.home-card:active {
+  transform: translateY(0);
+}
+
+.home-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--color-text);
+}
+
+.home-card-desc {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+/* ============================================
+   ツールパネル
+   ============================================ */
+
 .tool-panel {
   display: none;
   max-width: 900px;
@@ -213,6 +394,7 @@ html, body {
   font-weight: 600;
   color: var(--color-text);
   margin-bottom: 6px;
+  outline: none;
 }
 
 .tool-description {
@@ -220,7 +402,10 @@ html, body {
   color: var(--color-text-secondary);
 }
 
-/* ドロップゾーン */
+/* ============================================
+   ドロップゾーン
+   ============================================ */
+
 .drop-zone {
   border: 2px dashed var(--color-border);
   border-radius: var(--radius-lg);
@@ -237,6 +422,10 @@ html, body {
   background: var(--color-primary-light);
 }
 
+.drop-zone:hover .drop-zone-icon {
+  transform: scale(1.05);
+}
+
 .drop-zone.drag-over {
   border-color: var(--color-primary);
   background: var(--color-primary-light);
@@ -249,6 +438,7 @@ html, body {
   height: 48px;
   color: var(--color-text-tertiary);
   margin-bottom: 12px;
+  transition: transform var(--transition);
 }
 
 .drop-zone-text {
@@ -263,6 +453,26 @@ html, body {
   color: var(--color-text-tertiary);
 }
 
+.drop-zone-formats {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.format-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border: 1px solid var(--color-border);
+}
+
 .drop-zone-input {
   position: absolute;
   inset: 0;
@@ -270,7 +480,10 @@ html, body {
   cursor: pointer;
 }
 
-/* 設定パネル */
+/* ============================================
+   設定パネル
+   ============================================ */
+
 .tool-settings {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -324,6 +537,7 @@ html, body {
   background-position: right 10px center;
   cursor: pointer;
   transition: border-color var(--transition);
+  min-height: 38px;
 }
 
 .setting-select:focus {
@@ -341,6 +555,7 @@ html, body {
   color: var(--color-text);
   width: 120px;
   transition: border-color var(--transition);
+  min-height: 38px;
 }
 
 .setting-input.wide {
@@ -407,13 +622,17 @@ html, body {
   padding: 2px;
 }
 
-/* ボタン */
+/* ============================================
+   ボタン
+   ============================================ */
+
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   padding: 8px 20px;
+  min-height: 44px;
   font-size: 14px;
   font-weight: 600;
   font-family: var(--font-family);
@@ -462,7 +681,16 @@ html, body {
   background: #c12d31;
 }
 
-/* 結果エリア */
+.btn-reset {
+  font-size: 13px;
+  min-height: 38px;
+  padding: 6px 16px;
+}
+
+/* ============================================
+   結果エリア
+   ============================================ */
+
 .tool-result {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -470,6 +698,7 @@ html, body {
   padding: 20px;
   margin-top: 16px;
   box-shadow: var(--shadow-4);
+  border-top: 3px solid var(--color-success);
 }
 
 .result-list {
@@ -533,6 +762,7 @@ html, body {
   color: var(--color-primary);
   font-weight: 600;
   transition: all var(--transition);
+  min-height: 32px;
 }
 
 .result-item-btn:hover {
@@ -543,6 +773,7 @@ html, body {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .result-preview {
@@ -595,7 +826,10 @@ html, body {
   background: var(--color-bg);
 }
 
-/* プログレスバー */
+/* ============================================
+   プログレスバー
+   ============================================ */
+
 .tool-progress {
   margin-top: 16px;
   display: flex;
@@ -627,7 +861,10 @@ html, body {
   text-align: right;
 }
 
-/* ファイルリスト（ドラッグ並び替え対応） */
+/* ============================================
+   ファイルリスト（ドラッグ並び替え対応）
+   ============================================ */
+
 .file-list {
   margin: 8px 0 16px;
 }
@@ -643,6 +880,7 @@ html, body {
   background: var(--color-surface);
   cursor: grab;
   transition: box-shadow var(--transition);
+  min-height: 44px;
 }
 
 .file-list-item:active {
@@ -684,10 +922,15 @@ html, body {
   border: none;
   color: var(--color-text-tertiary);
   cursor: pointer;
-  padding: 2px;
+  padding: 4px;
   border-radius: var(--radius-sm);
   display: flex;
   transition: color var(--transition);
+  min-width: 28px;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
 }
 
 .file-list-item-remove:hover {
@@ -715,7 +958,10 @@ html, body {
   color: #107c10;
 }
 
-/* トースト通知 */
+/* ============================================
+   トースト通知
+   ============================================ */
+
 .toast-container {
   position: fixed;
   bottom: 24px;
@@ -751,7 +997,10 @@ html, body {
   to { opacity: 0; transform: translateY(-8px); }
 }
 
-/* レスポンシブ */
+/* ============================================
+   レスポンシブ
+   ============================================ */
+
 @media (max-width: 768px) {
   .sidebar {
     position: fixed;
@@ -788,9 +1037,70 @@ html, body {
   .setting-input.wide {
     max-width: 100%;
   }
+
+  .home-title {
+    font-size: 22px;
+  }
+
+  .home-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .home-card {
+    padding: 16px;
+    min-height: 80px;
+  }
+
+  .home-card-title {
+    font-size: 14px;
+  }
+
+  .home-card-desc {
+    font-size: 11px;
+  }
+
+  .result-actions {
+    gap: 6px;
+  }
+
+  .btn {
+    min-height: 44px;
+    padding: 8px 16px;
+  }
 }
 
-/* スクロールバー */
+/* ============================================
+   prefers-reduced-motion
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .tool-panel {
+    animation: none;
+  }
+
+  .drop-zone.drag-over {
+    transform: none;
+  }
+
+  .home-card:hover {
+    transform: none;
+  }
+}
+
+/* ============================================
+   スクロールバー
+   ============================================ */
+
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -808,7 +1118,10 @@ html, body {
   background: var(--color-text-secondary);
 }
 
-/* チェックボックス */
+/* ============================================
+   チェックボックス
+   ============================================ */
+
 input[type="checkbox"] {
   width: 16px;
   height: 16px;

@@ -219,4 +219,12 @@
     });
     return btn;
   }
+
+  // --- リセット ---
+  document.getElementById('icomp-reset').addEventListener('click', () => {
+    results = [];
+    resultList.innerHTML = '';
+    resultArea.style.display = 'none';
+    document.getElementById('icomp-file').value = '';
+  });
 })();

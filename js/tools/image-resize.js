@@ -181,4 +181,17 @@
 
     return src;
   }
+
+  // --- リセット ---
+  document.getElementById('ir-reset').addEventListener('click', () => {
+    sourceImg = null;
+    sourceFile = null;
+    resultBlob = null;
+    resultName = '';
+    settingsPanel.style.display = 'none';
+    resultArea.style.display = 'none';
+    previewEl.innerHTML = '';
+    infoEl.innerHTML = '';
+    document.getElementById('ir-file').value = '';
+  });
 })();

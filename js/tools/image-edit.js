@@ -651,9 +651,11 @@
 
   deleteBtn.addEventListener('click', deleteSelected);
 
-  // --- 全クリア ---
+  // --- 全クリア（確認ダイアログ付き） ---
   clearBtn.addEventListener('click', function () {
     if (!fc) return;
+    if (fc.getObjects().length === 0) return;
+    if (!confirm('すべての描画をクリアしますか？この操作は元に戻せません。')) return;
     fc.getObjects().slice().forEach(function (obj) { fc.remove(obj); });
     fc.discardActiveObject();
     fc.renderAll();

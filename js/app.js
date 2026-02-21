@@ -7,16 +7,38 @@
   const menuToggle = document.getElementById('menuToggle');
   const sidebarItems = document.querySelectorAll('.sidebar-item');
   const toolPanels = document.querySelectorAll('.tool-panel');
+  const overlay = document.getElementById('sidebarOverlay');
+  const headerTitleLink = document.getElementById('headerTitleLink');
+
+  // ホーム画面のカードリンク
+  const homeCards = document.querySelectorAll('.home-card');
 
   // サイドバー開閉
   menuToggle.addEventListener('click', () => {
     sidebar.classList.toggle('collapsed');
+    updateOverlay();
   });
+
+  // モバイルオーバーレイ：外側タップで閉じる
+  if (overlay) {
+    overlay.addEventListener('click', () => {
+      sidebar.classList.add('collapsed');
+      updateOverlay();
+    });
+  }
+
+  function updateOverlay() {
+    if (!overlay) return;
+    const isMobile = window.innerWidth <= 768;
+    const isOpen = !sidebar.classList.contains('collapsed');
+    overlay.classList.toggle('active', isMobile && isOpen);
+  }
 
   // モバイル時：ツール選択でサイドバーを閉じる
   function closeSidebarOnMobile() {
     if (window.innerWidth <= 768) {
       sidebar.classList.add('collapsed');
+      updateOverlay();
     }
   }
 
@@ -29,10 +51,24 @@
 
     // パネルの表示切り替え
     toolPanels.forEach((panel) => {
-      panel.classList.toggle('active', panel.id === `tool-${toolId}`);
+      const panelId = panel.id === 'tool-home' ? 'home' : panel.id.replace('tool-', '');
+      panel.classList.toggle('active', panelId === toolId);
     });
 
     closeSidebarOnMobile();
+
+    // フォーカス管理：ツールタイトルにフォーカス移動
+    requestAnimationFrame(() => {
+      const activePanel = document.getElementById(
+        toolId === 'home' ? 'tool-home' : 'tool-' + toolId
+      );
+      if (activePanel) {
+        const title = activePanel.querySelector('.tool-title, .home-title');
+        if (title) {
+          title.focus({ preventScroll: false });
+        }
+      }
+    });
   }
 
   // サイドバーのクリックイベント
@@ -45,16 +81,40 @@
     });
   });
 
+  // ホーム画面カードのクリックイベント
+  homeCards.forEach((card) => {
+    card.addEventListener('click', (e) => {
+      e.preventDefault();
+      const toolId = card.dataset.tool;
+      window.location.hash = toolId;
+      activateTool(toolId);
+    });
+  });
+
+  // ヘッダータイトルクリックでホームに戻る
+  if (headerTitleLink) {
+    headerTitleLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location.hash = 'home';
+      activateTool('home');
+    });
+  }
+
   // ハッシュ変更時
   window.addEventListener('hashchange', () => {
     const hash = window.location.hash.slice(1);
     if (hash) activateTool(hash);
   });
 
-  // 初期表示
-  const initialHash = window.location.hash.slice(1) || 'image-convert';
+  // 初期表示：ハッシュがなければホーム画面
+  const initialHash = window.location.hash.slice(1) || 'home';
   window.location.hash = initialHash;
   activateTool(initialHash);
+
+  // ウィンドウリサイズ時にオーバーレイ状態を更新
+  window.addEventListener('resize', () => {
+    updateOverlay();
+  });
 
   // PDF.js ワーカー設定
   if (typeof pdfjsLib !== 'undefined') {
