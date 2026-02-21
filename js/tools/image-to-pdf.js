@@ -200,12 +200,7 @@
     }
   });
 
-  // --- HTMLエスケープ ---
-  function escapeHTML(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
+  var escapeHTML = ChoiTool.escapeHTML;
   // --- リセット ---
   document.getElementById('i2p-reset').addEventListener('click', () => {
     imageFiles = [];

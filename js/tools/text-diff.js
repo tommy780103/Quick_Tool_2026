@@ -13,13 +13,7 @@
   var statsEl = document.getElementById('diff-stats');
   var outputEl = document.getElementById('diff-output');
 
-  function escapeHtml(str) {
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
+  var escapeHtml = ChoiTool.escapeHTML;
 
   function computeDiff(oldText, newText, mode) {
     switch (mode) {

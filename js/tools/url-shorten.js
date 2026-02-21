@@ -29,8 +29,13 @@
       return;
     }
 
-    // 簡易URL検証
-    if (!/^https?:\/\/.+/i.test(url)) {
+    // URL検証
+    try {
+      var parsed = new URL(url);
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        throw new Error('invalid protocol');
+      }
+    } catch (_) {
       ChoiTool.showToast('有効なURL（http:// または https://）を入力してください', 'error');
       return;
     }
@@ -126,13 +131,6 @@
     });
   }
 
-  function escapeHTML(str) {
-    var div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
-  function escapeAttr(str) {
-    return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
+  var escapeHTML = ChoiTool.escapeHTML;
+  var escapeAttr = ChoiTool.escapeAttr;
 })();

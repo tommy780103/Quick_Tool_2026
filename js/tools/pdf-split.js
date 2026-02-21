@@ -316,12 +316,7 @@
     results.forEach(function (r) { ChoiTool.downloadBlob(r.blob, r.name); });
   });
 
-  // --- HTMLエスケープ ---
-  function escapeHTML(str) {
-    var div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
+  var escapeHTML = ChoiTool.escapeHTML;
 
   // --- リセット ---
   document.getElementById('ps-reset').addEventListener('click', function () {

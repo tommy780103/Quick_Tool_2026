@@ -131,11 +131,7 @@
     return parts.join('');
   }
 
-  function escapeHTML(str) {
-    var div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
+  var escapeHTML = ChoiTool.escapeHTML;
 
   // --- ファイル読み込み ---
   ChoiTool.initDropZone('ecc-drop', 'ecc-file', {

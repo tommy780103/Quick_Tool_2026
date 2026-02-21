@@ -4,6 +4,28 @@
 
 const ChoiTool = {
   /**
+   * HTMLエスケープ
+   * @param {string} str
+   * @returns {string}
+   */
+  escapeHTML(str) {
+    if (typeof str !== 'string') str = String(str);
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  },
+
+  /**
+   * HTML属性値エスケープ
+   * @param {string} str
+   * @returns {string}
+   */
+  escapeAttr(str) {
+    if (typeof str !== 'string') str = String(str);
+    return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;');
+  },
+
+  /**
    * ドロップゾーンを初期化
    * @param {string} dropId - ドロップゾーン要素のID
    * @param {string} inputId - file input要素のID

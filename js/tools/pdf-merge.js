@@ -309,12 +309,7 @@
     }
   });
 
-  // --- HTMLエスケープ ---
-  function escapeHTML(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
+  var escapeHTML = ChoiTool.escapeHTML;
 
   // --- リセット ---
   document.getElementById('pm-reset').addEventListener('click', () => {

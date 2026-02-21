@@ -23,12 +23,7 @@
   var activeSheet = null;
   var sheetNames = [];
 
-  // --- ユーティリティ ---
-  function escapeHTML(str) {
-    var div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
+  var escapeHTML = ChoiTool.escapeHTML;
 
   /** 列番号をExcel式のアルファベット列名に変換（0→A, 25→Z, 26→AA ...） */
   function colLetter(col) {
@@ -290,7 +285,7 @@
           displayVal = escapeHTML(info.oldVal);
         } else if (info.type === 'changed') {
           cellClass = ' class="ed-changed"';
-          tooltip = ' title="旧: ' + escapeHTML(info.oldVal) + ' → 新: ' + escapeHTML(info.newVal) + '"';
+          tooltip = ' title="旧: ' + ChoiTool.escapeAttr(info.oldVal) + ' → 新: ' + ChoiTool.escapeAttr(info.newVal) + '"';
           displayVal = escapeHTML(info.newVal);
         } else {
           displayVal = escapeHTML(info.newVal);

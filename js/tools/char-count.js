@@ -122,9 +122,7 @@
     return count;
   }
 
-  function escapeHtml(str) {
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
+  var escapeHtml = ChoiTool.escapeHTML;
 
   function update() {
     var text = textEl.value;

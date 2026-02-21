@@ -421,10 +421,5 @@
     formatSelect.value = 'PNG';
   });
 
-  // --- HTMLエスケープ ---
-  function escapeHTML(str) {
-    var div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
+  var escapeHTML = ChoiTool.escapeHTML;
 })();

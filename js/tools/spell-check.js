@@ -215,9 +215,7 @@
 
   // ===== チェックロジック =====
 
-  function escapeHtml(str) {
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
+  var escapeHtml = ChoiTool.escapeHTML;
 
   function escapeRegExp(str) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -492,7 +490,7 @@
 
       var cls = 'sc-mark sc-mark-' + issue.level;
       var tip = issue.category + ': ' + issue.msg;
-      html += '<span class="' + cls + '" data-idx="' + idx + '" data-tip="' + escapeHtml(tip) + '">';
+      html += '<span class="' + cls + '" data-idx="' + idx + '" data-tip="' + ChoiTool.escapeAttr(tip) + '">';
       html += escapeHtml(text.substring(issue.start, issue.end));
       html += '</span>';
       cursor = issue.end;

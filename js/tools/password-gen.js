@@ -102,10 +102,7 @@
     strengthLabel.textContent = strength.label + '（' + Math.floor(strength.bits) + ' bits）';
   }
 
-  // --- HTMLエスケープ ---
-  function escapeHtml(str) {
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
+  var escapeHtml = ChoiTool.escapeHTML;
 
   // --- メイン生成処理 ---
   function generate() {
@@ -136,7 +133,7 @@
       for (var j = 0; j < passwords.length; j++) {
         html += '<div class="pg-password-row" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
         html += '<span class="pg-password-text" style="flex:1;word-break:break-all;">' + escapeHtml(passwords[j]) + '</span>';
-        html += '<button type="button" class="btn btn-sm btn-outline pg-copy-single" data-password="' + escapeHtml(passwords[j]) + '" title="コピー">';
+        html += '<button type="button" class="btn btn-sm btn-outline pg-copy-single" data-password="' + ChoiTool.escapeAttr(passwords[j]) + '" title="コピー">';
         html += 'コピー';
         html += '</button>';
         html += '</div>';
@@ -207,7 +204,7 @@
       html += '<span style="font-family:monospace;font-size:13px;flex:1;word-break:break-all;">' + escapeHtml(item.password) + '</span>';
       html += '<span style="font-size:11px;color:var(--color-text-secondary);white-space:nowrap;">' + escapeHtml(item.strength) + '</span>';
       html += '<span style="font-size:11px;color:var(--color-text-secondary);white-space:nowrap;">' + escapeHtml(timeStr) + '</span>';
-      html += '<button type="button" class="btn btn-sm btn-outline pg-history-copy" data-password="' + escapeHtml(item.password) + '" title="コピー">';
+      html += '<button type="button" class="btn btn-sm btn-outline pg-history-copy" data-password="' + ChoiTool.escapeAttr(item.password) + '" title="コピー">';
       html += 'コピー';
       html += '</button>';
       html += '</div>';
@@ -250,6 +247,11 @@
 
   // 生成数変更で自動再生成
   countEl.addEventListener('change', generate);
+
+  // --- ページ離脱時に履歴をクリア ---
+  window.addEventListener('beforeunload', function () {
+    history.length = 0;
+  });
 
   // --- 初期生成 ---
   lengthValEl.textContent = lengthEl.value;
