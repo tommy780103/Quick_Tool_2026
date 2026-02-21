@@ -4,6 +4,8 @@
 (function () {
   const settingsPanel = document.getElementById('i2p-settings');
   const sizeSelect = document.getElementById('i2p-size');
+  const orientSelect = document.getElementById('i2p-orient');
+  const orientRow = document.getElementById('i2p-orient-row');
   const marginCheck = document.getElementById('i2p-margin');
   const fileList = document.getElementById('i2p-list');
   const executeBtn = document.getElementById('i2p-execute');
@@ -62,6 +64,11 @@
     });
   }
 
+  // --- ページサイズ変更時に向き行の表示切替 ---
+  sizeSelect.addEventListener('change', () => {
+    orientRow.style.display = sizeSelect.value === 'fit' ? 'none' : '';
+  });
+
   // --- 並べ替え初期化 ---
   ChoiTool.initSortable('i2p-list', (newOrder) => {
     const reordered = newOrder.map((i) => imageFiles[i]);
@@ -96,10 +103,11 @@
     try {
       const pdfDoc = await PDFLib.PDFDocument.create();
       const pageSize = sizeSelect.value;
+      const orientation = orientSelect.value;
       const useMargin = marginCheck.checked;
       const margin = useMargin ? 40 : 0;
 
-      // ページサイズ定数
+      // ページサイズ定数（縦向き基準: width < height）
       const PAGE_SIZES = {
         a4: { width: 595.28, height: 841.89 },
         letter: { width: 612, height: 792 },
@@ -129,8 +137,20 @@
           pageHeight = imgHeight + margin * 2;
         } else {
           const ps = PAGE_SIZES[pageSize];
-          pageWidth = ps.width;
-          pageHeight = ps.height;
+          // 向きの判定
+          let useLandscape;
+          if (orientation === 'auto') {
+            useLandscape = imgWidth > imgHeight;
+          } else {
+            useLandscape = orientation === 'landscape';
+          }
+          if (useLandscape) {
+            pageWidth = ps.height;   // 横向き: 長辺を幅に
+            pageHeight = ps.width;
+          } else {
+            pageWidth = ps.width;    // 縦向き: 短辺を幅に
+            pageHeight = ps.height;
+          }
         }
 
         const page = pdfDoc.addPage([pageWidth, pageHeight]);

@@ -109,10 +109,15 @@
     img.src = imageDataURL;
   }
 
+  // ウィンドウリサイズ時にキャンバスサイズを追従
+  window.addEventListener('resize', ChoiTool.debounce(function () {
+    if (fc && editorEl.style.display !== 'none') applyZoom();
+  }, 200));
+
   function applyZoom() {
     if (!fc) return;
-    const maxW = containerEl.clientWidth - 32;
-    const maxH = containerEl.clientHeight - 32;
+    const maxW = (containerEl.clientWidth || 800) - 32;
+    const maxH = Math.max(containerEl.clientHeight, window.innerHeight - 250) - 32;
     const scale = Math.min(1, maxW / originalWidth, maxH / originalHeight);
     fc.setZoom(scale);
     fc.setWidth(originalWidth * scale);
