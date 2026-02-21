@@ -281,6 +281,7 @@
             <select class="setting-select" id="ir-mode">
               <option value="px">ピクセル指定</option>
               <option value="percent">パーセント指定</option>
+              <option value="crop">トリミング</option>
             </select>
           </div>
           <div class="setting-row" id="ir-px-row">
@@ -293,7 +294,21 @@
             <label class="setting-label">スケール <span id="ir-scale-val">100</span>%</label>
             <input type="range" class="setting-range" id="ir-scale" min="1" max="500" value="100">
           </div>
-          <div class="setting-row">
+          <div class="setting-row" id="ir-crop-row" style="display:none">
+            <label class="setting-label">トリミング範囲のアスペクト比</label>
+            <div class="ir-crop-ratios">
+              <button type="button" class="ir-crop-ratio-btn active" data-ratio="free">フリー</button>
+              <button type="button" class="ir-crop-ratio-btn" data-ratio="1:1">1:1</button>
+              <button type="button" class="ir-crop-ratio-btn" data-ratio="4:3">4:3</button>
+              <button type="button" class="ir-crop-ratio-btn" data-ratio="16:9">16:9</button>
+              <button type="button" class="ir-crop-ratio-btn" data-ratio="3:2">3:2</button>
+            </div>
+            <div class="ir-crop-workspace" id="ir-crop-workspace">
+              <canvas id="ir-crop-canvas"></canvas>
+            </div>
+            <div class="ir-crop-info">選択範囲: <span id="ir-crop-size">-</span></div>
+          </div>
+          <div class="setting-row" id="ir-aspect-row">
             <label class="setting-label">
               <input type="checkbox" id="ir-aspect" checked> アスペクト比を維持
             </label>
