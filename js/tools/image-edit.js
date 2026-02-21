@@ -32,6 +32,12 @@
   const penColorInput = document.getElementById('ie-prop-pen-color');
   const penWidthInput = document.getElementById('ie-prop-pen-width');
   const penWidthVal = document.getElementById('ie-prop-pen-width-val');
+  const fillClearBtn = document.getElementById('ie-fill-clear');
+  const strokeClearBtn = document.getElementById('ie-stroke-clear');
+
+  // クリア（透明）状態
+  let fillIsClear = false;
+  let strokeIsClear = false;
 
   // --- 状態 ---
   let fc = null; // fabric.Canvas
@@ -201,9 +207,17 @@
   }
 
   // --- 図形描画 ---
+  function getFillColor() {
+    return fillIsClear ? 'transparent' : fillInput.value;
+  }
+
+  function getStrokeColor() {
+    return strokeIsClear ? 'transparent' : strokeInput.value;
+  }
+
   function createTempShape(x, y) {
-    var fill = fillInput.value;
-    var stroke = strokeInput.value;
+    var fill = getFillColor();
+    var stroke = getStrokeColor();
     var sw = parseInt(strokeWidthInput.value, 10) || 2;
 
     switch (currentTool) {
@@ -293,7 +307,7 @@
     var text = new fabric.IText('テキスト', {
       left: x, top: y,
       fontSize: parseInt(fontSizeInput.value, 10) || 24,
-      fill: fillInput.value,
+      fill: getFillColor(),
       fontFamily: 'Meiryo, Yu Gothic, sans-serif',
       editable: true,
     });
@@ -306,20 +320,22 @@
 
   // --- コメント追加 ---
   function addComment(x, y) {
+    var textColor = getFillColor() === 'transparent' ? '#ff0000' : getFillColor();
     var textObj = new fabric.IText('コメント', {
       fontSize: 14,
-      fill: '#323130',
+      fill: textColor,
       fontFamily: 'Meiryo, Yu Gothic, sans-serif',
       originX: 'center',
       originY: 'center',
     });
 
     var pad = 12;
+    var borderColor = getStrokeColor() === 'transparent' ? '#ff0000' : getStrokeColor();
     var bg = new fabric.Rect({
       width: textObj.width + pad * 2,
       height: textObj.height + pad * 2,
       fill: '#fffde7',
-      stroke: '#f9a825',
+      stroke: borderColor,
       strokeWidth: 2,
       rx: 6, ry: 6,
       originX: 'center', originY: 'center',
@@ -444,8 +460,12 @@
     var isText = (obj.type === 'i-text' || obj.type === 'text');
     propText.style.display = isText ? '' : 'none';
 
-    fillInput.value = colorToHex(obj.fill) || '#000000';
-    strokeInput.value = colorToHex(obj.stroke) || '#000000';
+    var objFillClear = (!obj.fill || obj.fill === 'transparent');
+    var objStrokeClear = (!obj.stroke || obj.stroke === 'transparent');
+    setFillClear(objFillClear);
+    setStrokeClear(objStrokeClear);
+    if (!objFillClear) fillInput.value = colorToHex(obj.fill) || '#ff0000';
+    if (!objStrokeClear) strokeInput.value = colorToHex(obj.stroke) || '#ff0000';
     strokeWidthInput.value = obj.strokeWidth || 0;
     opacityInput.value = Math.round((obj.opacity || 1) * 100);
     opacityVal.textContent = opacityInput.value + '%';
@@ -458,7 +478,7 @@
   }
 
   function colorToHex(c) {
-    if (!c || c === 'transparent') return '#000000';
+    if (!c || c === 'transparent' || c === '') return null;
     if (c.charAt(0) === '#') return c.length === 7 ? c : c;
     // rgb(r,g,b) → #hex
     var m = c.match(/(\d+)/g);
@@ -466,16 +486,49 @@
       return '#' + ((1 << 24) + (parseInt(m[0]) << 16) + (parseInt(m[1]) << 8) + parseInt(m[2]))
         .toString(16).slice(1);
     }
-    return '#000000';
+    return null;
   }
+
+  // --- クリアボタン制御 ---
+  function setFillClear(clear) {
+    fillIsClear = clear;
+    fillClearBtn.classList.toggle('active', clear);
+    fillInput.classList.toggle('is-clear', clear);
+  }
+
+  function setStrokeClear(clear) {
+    strokeIsClear = clear;
+    strokeClearBtn.classList.toggle('active', clear);
+    strokeInput.classList.toggle('is-clear', clear);
+  }
+
+  fillClearBtn.addEventListener('click', function () {
+    setFillClear(!fillIsClear);
+    var obj = fc && fc.getActiveObject();
+    if (obj) {
+      obj.set('fill', fillIsClear ? 'transparent' : fillInput.value);
+      fc.renderAll();
+    }
+  });
+
+  strokeClearBtn.addEventListener('click', function () {
+    setStrokeClear(!strokeIsClear);
+    var obj = fc && fc.getActiveObject();
+    if (obj) {
+      obj.set('stroke', strokeIsClear ? 'transparent' : strokeInput.value);
+      fc.renderAll();
+    }
+  });
 
   // プロパティ → オブジェクト反映
   fillInput.addEventListener('input', function () {
+    if (fillIsClear) setFillClear(false);
     var obj = fc && fc.getActiveObject();
     if (obj) { obj.set('fill', fillInput.value); fc.renderAll(); }
   });
 
   strokeInput.addEventListener('input', function () {
+    if (strokeIsClear) setStrokeClear(false);
     var obj = fc && fc.getActiveObject();
     if (obj) { obj.set('stroke', strokeInput.value); fc.renderAll(); }
   });
