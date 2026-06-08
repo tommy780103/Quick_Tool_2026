@@ -39,7 +39,7 @@
         </a>
       </div>
       <div class="sidebar-group">
-        <div class="sidebar-category">画像加工 <span class="sidebar-count">6</span></div>
+        <div class="sidebar-category">画像加工 <span class="sidebar-count">7</span></div>
         <a class="sidebar-item" href="#image-convert" data-tool="image-convert">
           <svg class="sidebar-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 1.5h12a.5.5 0 01.5.5v6.8l-3.15-3.15a.75.75 0 00-1.06 0L8.5 12.44l-1.72-1.72a.75.75 0 00-1.06 0L3.5 12.94V5a.5.5 0 01.5-.5zM7 6.75a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0z"/></svg>
           フォーマット変換
@@ -63,6 +63,10 @@
         <a class="sidebar-item" href="#image-merge" data-tool="image-merge">
           <svg class="sidebar-icon" viewBox="0 0 20 20" fill="currentColor"><rect x="2" y="4" width="7" height="12" rx="1"/><rect x="11" y="4" width="7" height="12" rx="1"/><path d="M9 9l2 1-2 1V9z"/></svg>
           結合
+        </a>
+        <a class="sidebar-item" href="#sns-image" data-tool="sns-image">
+          <svg class="sidebar-icon" viewBox="0 0 20 20" fill="currentColor"><rect x="2.5" y="2.5" width="6.5" height="6.5" rx="1.2"/><rect x="11" y="2.5" width="6.5" height="6.5" rx="1.2"/><rect x="2.5" y="11" width="6.5" height="6.5" rx="1.2"/><rect x="11" y="11" width="6.5" height="6.5" rx="1.2"/></svg>
+          SNS画像作成
         </a>
       </div>
       <div class="sidebar-group">
@@ -196,6 +200,10 @@
               <a class="home-card" href="#image-merge" data-tool="image-merge">
                 <div class="home-card-title">結合</div>
                 <div class="home-card-desc">複数画像を横・縦・グリッドに結合</div>
+              </a>
+              <a class="home-card" href="#sns-image" data-tool="sns-image">
+                <div class="home-card-title">SNS画像作成</div>
+                <div class="home-card-desc">YouTube・TikTok・Instagram サイズで写真分割＋テキスト</div>
               </a>
             </div>
           </div>
@@ -1570,6 +1578,84 @@
         </div>
       </section>
 
+      <!-- SNS画像作成 -->
+      <section class="tool-panel" id="tool-sns-image">
+        <div class="tool-header">
+          <h2 class="tool-title" tabindex="-1">SNS画像作成</h2>
+          <p class="tool-description">YouTube・TikTok・Instagram などのサイズで、写真を最大10フレームに分割配置し、テキストを載せて1枚の画像を作成します。</p>
+        </div>
+
+        <div class="si-controls">
+          <div class="si-control-group">
+            <label class="setting-label" for="si-preset">サイズ</label>
+            <select class="setting-input" id="si-preset"></select>
+          </div>
+          <div class="si-control-group" id="si-custom" style="display:none">
+            <label class="setting-label">カスタム (px)</label>
+            <div class="si-custom-row">
+              <input type="number" class="setting-input" id="si-custom-w" value="1080" min="100" max="4000">
+              <span class="si-x">×</span>
+              <input type="number" class="setting-input" id="si-custom-h" value="1080" min="100" max="4000">
+            </div>
+          </div>
+          <div class="si-control-group">
+            <label class="setting-label" for="si-frames">フレーム数 <span id="si-frames-val">1</span></label>
+            <input type="range" class="setting-range" id="si-frames" min="1" max="10" value="1">
+          </div>
+          <div class="si-control-group">
+            <label class="setting-label" for="si-layout">レイアウト</label>
+            <select class="setting-input" id="si-layout">
+              <option value="grid">グリッド</option>
+              <option value="horizontal">横並び</option>
+              <option value="vertical">縦並び</option>
+            </select>
+          </div>
+          <div class="si-control-group">
+            <label class="setting-label" for="si-gap">フレーム間の余白 <span id="si-gap-val">8</span></label>
+            <input type="range" class="setting-range" id="si-gap" min="0" max="100" value="8">
+          </div>
+          <div class="si-control-group si-control-inline">
+            <label class="setting-label" for="si-bg">背景色</label>
+            <input type="color" class="si-color" id="si-bg" value="#ffffff">
+          </div>
+        </div>
+
+        <div class="si-text-bar">
+          <button class="btn btn-secondary btn-sm" id="si-add-text" type="button">＋ テキスト追加</button>
+          <div class="si-text-props">
+            <select class="setting-input" id="si-font" title="フォント">
+              <option value="'Segoe UI', 'Meiryo', 'Yu Gothic', sans-serif">ゴシック</option>
+              <option value="'Yu Mincho', 'Hiragino Mincho ProN', 'MS Mincho', serif">明朝</option>
+              <option value="'Arial Black', 'Meiryo', sans-serif">太ゴシック</option>
+              <option value="'Impact', sans-serif">Impact</option>
+              <option value="'Georgia', serif">Georgia</option>
+            </select>
+            <input type="number" class="setting-input si-font-size" id="si-font-size" value="64" min="8" max="500" title="文字サイズ">
+            <input type="color" class="si-color" id="si-text-color" value="#ffffff" title="文字色">
+            <button class="btn btn-secondary btn-sm si-toggle" id="si-text-bold" type="button" title="太字"><b>B</b></button>
+            <button class="btn btn-secondary btn-sm si-toggle" id="si-text-outline" type="button" title="フチ取り">フチ</button>
+            <button class="btn btn-danger btn-sm" id="si-delete" type="button" title="選択中のオブジェクトを削除">削除</button>
+          </div>
+        </div>
+
+        <div class="si-workspace" id="si-workspace">
+          <canvas id="si-canvas"></canvas>
+        </div>
+        <input type="file" id="si-frame-file" accept="image/*" style="display:none">
+
+        <div class="si-actions">
+          <span class="si-hint">フレームをクリックで写真を追加（画像をダブルクリックで差し替え）／ テキストはドラッグで移動・ダブルクリックで編集</span>
+          <div class="si-actions-right">
+            <select class="setting-input si-format" id="si-format">
+              <option value="png">PNG</option>
+              <option value="jpeg">JPG</option>
+            </select>
+            <button class="btn btn-secondary" id="si-reset" type="button">リセット</button>
+            <button class="btn btn-primary" id="si-download" type="button">ダウンロード</button>
+          </div>
+        </div>
+      </section>
+
     </main>
   </div>
 
@@ -1604,6 +1690,7 @@
   <script src="js/tools/excel-char-check.js"></script>
   <script src="js/tools/bg-remove.js"></script>
   <script src="js/tools/image-merge.js"></script>
+  <script src="js/tools/sns-image.js"></script>
   <script src="js/tools/pdf-password.js"></script>
   <script src="js/tools/pdf-text.js"></script>
   <script src="js/tools/excel-diff.js"></script>
