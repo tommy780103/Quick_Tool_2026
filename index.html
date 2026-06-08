@@ -119,7 +119,7 @@
         </a>
       </div>
       <div class="sidebar-group">
-        <div class="sidebar-category">便利ツール <span class="sidebar-count">5</span></div>
+        <div class="sidebar-category">便利ツール <span class="sidebar-count">6</span></div>
         <a class="sidebar-item" href="#qr-generate" data-tool="qr-generate">
           <svg class="sidebar-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 5a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm2-.5a.5.5 0 00-.5.5v3a.5.5 0 00.5.5h3a.5.5 0 00.5-.5V5a.5.5 0 00-.5-.5H5zM6 6h1v1H6V6zm-3 6a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-3zm2-.5a.5.5 0 00-.5.5v3a.5.5 0 00.5.5h3a.5.5 0 00.5-.5v-3a.5.5 0 00-.5-.5H5zm1 1.5h1v1H6v-1zM12 3a2 2 0 00-2 2v3a2 2 0 002 2h3a2 2 0 002-2V5a2 2 0 00-2-2h-3zm-.5 2a.5.5 0 01.5-.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5h-3a.5.5 0 01-.5-.5V5zm1.5 1h1v1h-1V6zm-2 6.5a.5.5 0 01.5-.5h1a.5.5 0 010 1h-1a.5.5 0 01-.5-.5zm4 0a.5.5 0 01.5-.5h1.5v1.5a.5.5 0 01-1 0V13h-.5a.5.5 0 01-.5-.5zM11 15a1 1 0 011-1h1v1a1 1 0 01-1 1h-1v1h2.5a.5.5 0 010 1H11v-3zm5-1h1a1 1 0 011 1v2a1 1 0 01-1 1h-1a1 1 0 01-1-1v-2a1 1 0 011-1z"/></svg>
           QRコード生成
@@ -140,6 +140,10 @@
           <svg class="sidebar-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M7 2a1 1 0 00-1 1v1H4.5A1.5 1.5 0 003 5.5v10A1.5 1.5 0 004.5 17h11a1.5 1.5 0 001.5-1.5v-10A1.5 1.5 0 0015.5 4H14V3a1 1 0 10-2 0v1H8V3a1 1 0 00-1-1zM4.5 8h11v7.5h-11V8z"/></svg>
           カレンダー
         </a>
+        <a class="sidebar-item" href="#era-convert" data-tool="era-convert">
+          <svg class="sidebar-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M7.5 3.5a.75.75 0 00-1.06 0l-3 3a.75.75 0 000 1.06l3 3a.75.75 0 101.06-1.06L5.81 7.75H14a.75.75 0 000-1.5H5.81l1.69-1.69a.75.75 0 000-1.06zm5 6a.75.75 0 011.06 0l3 3a.75.75 0 010 1.06l-3 3a.75.75 0 11-1.06-1.06l1.69-1.69H6a.75.75 0 010-1.5h8.19l-1.69-1.69a.75.75 0 010-1.06z"/></svg>
+          西暦和暦変換
+        </a>
       </div>
       <div class="sidebar-footer">
         <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm-.75 4.75a.75.75 0 011.5 0v4.5a.75.75 0 01-1.5 0v-4.5zM10 14a1 1 0 100-2 1 1 0 000 2z"/></svg>
@@ -156,7 +160,7 @@
       <section class="tool-panel" id="tool-home">
         <div class="home-hero">
           <h2 class="home-title" tabindex="-1">ようこそ！ちょいツールへ</h2>
-          <p class="home-subtitle">社内向けブラウザ完結型ツール集です。<br>ファイルはサーバーに送信されず、すべてブラウザ内で処理されます。</p>
+          <p class="home-subtitle">ブラウザ完結型ツール集です。<br>ファイルはサーバーに送信されず、すべてブラウザ内で処理されます。</p>
         </div>
         <div class="home-categories">
           <div class="home-category">
@@ -276,6 +280,10 @@
               <a class="home-card" href="#calendar" data-tool="calendar">
                 <div class="home-card-title">カレンダー</div>
                 <div class="home-card-desc">日本の祝日付き月間カレンダー</div>
+              </a>
+              <a class="home-card" href="#era-convert" data-tool="era-convert">
+                <div class="home-card-title">西暦和暦変換</div>
+                <div class="home-card-desc">西暦と和暦（元号）を相互変換</div>
               </a>
             </div>
           </div>
@@ -1369,6 +1377,79 @@
         <div class="cal-holiday-list" id="cal-holidays"></div>
       </section>
 
+      <!-- 西暦和暦変換 -->
+      <section class="tool-panel" id="tool-era-convert">
+        <div class="tool-header">
+          <h2 class="tool-title" tabindex="-1">西暦和暦変換</h2>
+          <p class="tool-description">西暦と和暦（元号）を相互に変換します。明治・大正・昭和・平成・令和に対応しています。</p>
+        </div>
+
+        <!-- 西暦 → 和暦 -->
+        <div class="ec-card">
+          <div class="ec-card-head">
+            <span class="ec-card-title">西暦 → 和暦</span>
+            <button class="btn btn-secondary btn-sm" id="ec-g-today" type="button">今日の日付</button>
+          </div>
+          <div class="ec-input-grid">
+            <div class="ec-field ec-field-grow">
+              <label class="setting-label" for="ec-g-year">年（西暦）</label>
+              <input type="number" class="setting-input" id="ec-g-year" placeholder="2026" min="1868" max="2999" inputmode="numeric">
+            </div>
+            <div class="ec-field">
+              <label class="setting-label" for="ec-g-month">月（任意）</label>
+              <input type="number" class="setting-input" id="ec-g-month" placeholder="--" min="1" max="12" inputmode="numeric">
+            </div>
+            <div class="ec-field">
+              <label class="setting-label" for="ec-g-day">日（任意）</label>
+              <input type="number" class="setting-input" id="ec-g-day" placeholder="--" min="1" max="31" inputmode="numeric">
+            </div>
+          </div>
+          <div class="ec-result-row">
+            <div class="ec-result" id="ec-g-result" aria-live="polite"><span class="ec-result-placeholder">西暦の年を入力してください</span></div>
+            <button class="btn btn-secondary btn-sm ec-copy-btn" id="ec-g-copy" type="button" style="display:none">コピー</button>
+          </div>
+        </div>
+
+        <!-- 和暦 → 西暦 -->
+        <div class="ec-card">
+          <div class="ec-card-head">
+            <span class="ec-card-title">和暦 → 西暦</span>
+          </div>
+          <div class="ec-input-grid">
+            <div class="ec-field ec-field-grow">
+              <label class="setting-label" for="ec-w-era">元号</label>
+              <select class="setting-input" id="ec-w-era"></select>
+            </div>
+            <div class="ec-field">
+              <label class="setting-label" for="ec-w-year">年（元年=1）</label>
+              <input type="number" class="setting-input" id="ec-w-year" placeholder="8" min="1" max="99" inputmode="numeric">
+            </div>
+            <div class="ec-field">
+              <label class="setting-label" for="ec-w-month">月（任意）</label>
+              <input type="number" class="setting-input" id="ec-w-month" placeholder="--" min="1" max="12" inputmode="numeric">
+            </div>
+            <div class="ec-field">
+              <label class="setting-label" for="ec-w-day">日（任意）</label>
+              <input type="number" class="setting-input" id="ec-w-day" placeholder="--" min="1" max="31" inputmode="numeric">
+            </div>
+          </div>
+          <div class="ec-result-row">
+            <div class="ec-result" id="ec-w-result" aria-live="polite"><span class="ec-result-placeholder">元号と年を入力してください</span></div>
+            <button class="btn btn-secondary btn-sm ec-copy-btn" id="ec-w-copy" type="button" style="display:none">コピー</button>
+          </div>
+        </div>
+
+        <!-- 元号早見表 -->
+        <div class="ec-card">
+          <div class="ec-card-head">
+            <span class="ec-card-title">元号早見表</span>
+          </div>
+          <div class="ec-table-wrap">
+            <table class="ec-table" id="ec-table"></table>
+          </div>
+        </div>
+      </section>
+
     </main>
   </div>
 
@@ -1409,5 +1490,6 @@
   <script src="js/tools/password-gen.js"></script>
   <script src="js/tools/color-picker.js"></script>
   <script src="js/tools/calendar.js"></script>
+  <script src="js/tools/era-convert.js"></script>
 </body>
 </html>
