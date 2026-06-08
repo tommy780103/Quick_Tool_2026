@@ -16,6 +16,9 @@
   var gapEl       = document.getElementById('si-gap');
   var gapVal      = document.getElementById('si-gap-val');
   var bgEl        = document.getElementById('si-bg');
+  var bgPresetsEl = document.getElementById('si-bg-presets');
+  var bgHexEl     = document.getElementById('si-bg-hex');
+  var bgApplyBtn  = document.getElementById('si-bg-apply');
   var addTextBtn  = document.getElementById('si-add-text');
   var fontEl      = document.getElementById('si-font');
   var fontSizeEl  = document.getElementById('si-font-size');
@@ -54,6 +57,58 @@
   var activeFrameIndex = -1;
   var boldOn = false;
   var outlineOn = false;
+
+  // --- 背景色 ---
+  var BG_PRESETS = [
+    '#FFFFFF', '#000000', '#F3F4F6', '#9CA3AF', '#1F2937',
+    '#FEF3C7', '#FDE047', '#FDBA74', '#FCA5A5', '#FECDD3',
+    '#A7F3D0', '#34D399', '#93C5FD', '#60A5FA', '#C4B5FD', '#F9A8D4'
+  ];
+
+  /** カラーコードを正規化（#省略・3桁対応）。不正なら null */
+  function normalizeHex(input) {
+    if (!input) return null;
+    var s = String(input).trim().replace(/^#/, '');
+    if (/^[0-9a-fA-F]{3}$/.test(s)) {
+      s = s.charAt(0) + s.charAt(0) + s.charAt(1) + s.charAt(1) + s.charAt(2) + s.charAt(2);
+    }
+    return /^[0-9a-fA-F]{6}$/.test(s) ? '#' + s.toLowerCase() : null;
+  }
+
+  function highlightActiveBgPreset(hex) {
+    if (!bgPresetsEl) return;
+    var up = hex.toUpperCase();
+    var sws = bgPresetsEl.querySelectorAll('.si-bg-swatch');
+    for (var i = 0; i < sws.length; i++) {
+      sws[i].classList.toggle('active', sws[i].dataset.color.toUpperCase() === up);
+    }
+  }
+
+  /** 背景色を設定（プリセット・スポイト・カラーコード入力の共通処理） */
+  function setBgColor(hex) {
+    var norm = normalizeHex(hex);
+    if (!norm) return;
+    state.bg = norm;
+    if (fc) { fc.backgroundColor = norm; fc.renderAll(); }
+    if (bgEl) bgEl.value = norm;
+    if (bgHexEl) bgHexEl.value = norm.toUpperCase();
+    highlightActiveBgPreset(norm);
+  }
+
+  function renderBgPresets() {
+    if (!bgPresetsEl) return;
+    bgPresetsEl.innerHTML = '';
+    BG_PRESETS.forEach(function (color) {
+      var sw = document.createElement('button');
+      sw.type = 'button';
+      sw.className = 'si-bg-swatch';
+      sw.style.backgroundColor = color;
+      sw.title = color;
+      sw.dataset.color = color;
+      sw.addEventListener('click', function () { setBgColor(color); });
+      bgPresetsEl.appendChild(sw);
+    });
+  }
 
   // --- レイアウト計算 ---
   function computeCells(W, H, n, layout, gap) {
@@ -350,8 +405,25 @@
   });
 
   bgEl.addEventListener('input', function () {
-    state.bg = bgEl.value;
-    if (fc) { fc.backgroundColor = state.bg; fc.renderAll(); }
+    setBgColor(bgEl.value);
+  });
+
+  function applyBgFromHexInput() {
+    var hex = normalizeHex(bgHexEl.value);
+    if (hex) {
+      setBgColor(hex);
+    } else {
+      ChoiTool.showToast('カラーコードが正しくありません（例: #FF8800）', 'error');
+    }
+  }
+  bgApplyBtn.addEventListener('click', applyBgFromHexInput);
+  bgHexEl.addEventListener('change', applyBgFromHexInput);
+  bgHexEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); applyBgFromHexInput(); }
+  });
+  bgHexEl.addEventListener('paste', function () {
+    // 貼り付け後の値を反映させるため次フレームで処理
+    setTimeout(applyBgFromHexInput, 0);
   });
 
   frameFileEl.addEventListener('change', function () {
@@ -450,4 +522,6 @@
 
   // --- 起動時セットアップ ---
   initPresetSelect();
+  renderBgPresets();
+  setBgColor(state.bg);
 })();

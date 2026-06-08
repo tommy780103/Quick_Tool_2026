@@ -2514,3 +2514,93 @@
     justify-content: flex-end;
   }
 }
+
+/* SNS画像作成 : 背景色（プリセット + 詳細） */
+.si-control-full {
+  grid-column: 1 / -1;
+}
+
+.si-bg-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.si-bg-swatch {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.si-bg-swatch:hover {
+  transform: scale(1.08);
+  box-shadow: var(--shadow-4);
+}
+
+.si-bg-swatch.active {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light), 0 0 0 4px var(--color-primary);
+}
+
+.si-bg-detail {
+  margin-top: 12px;
+}
+
+.si-bg-detail summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  font-size: 13px;
+  color: var(--color-primary);
+  cursor: pointer;
+  padding: 4px 0;
+  user-select: none;
+}
+
+.si-bg-detail summary:hover {
+  text-decoration: underline;
+}
+
+.si-bg-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.si-bg-hex {
+  width: 170px;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+}
+
+/* スマホ: タップしやすく */
+@media (max-width: 768px) {
+  .si-bg-swatch {
+    width: 44px;
+    height: 44px;
+  }
+  .si-bg-detail-row {
+    gap: 10px;
+  }
+  .si-bg-hex {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 140px;
+    min-height: 44px;
+  }
+  .si-bg-detail-row .si-color {
+    width: 48px;
+    height: 44px;
+  }
+  .si-bg-detail-row .btn {
+    min-height: 44px;
+  }
+}

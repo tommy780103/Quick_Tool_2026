@@ -1614,9 +1614,17 @@
             <label class="setting-label" for="si-gap">フレーム間の余白 <span id="si-gap-val">8</span></label>
             <input type="range" class="setting-range" id="si-gap" min="0" max="100" value="8">
           </div>
-          <div class="si-control-group si-control-inline">
-            <label class="setting-label" for="si-bg">背景色</label>
-            <input type="color" class="si-color" id="si-bg" value="#ffffff">
+          <div class="si-control-group si-control-full">
+            <label class="setting-label">背景色</label>
+            <div class="si-bg-presets" id="si-bg-presets"></div>
+            <details class="si-bg-detail">
+              <summary>詳細（スポイト・カラーコード）</summary>
+              <div class="si-bg-detail-row">
+                <input type="color" class="si-color" id="si-bg" value="#ffffff" title="スポイトで色を選択">
+                <input type="text" class="setting-input si-bg-hex" id="si-bg-hex" placeholder="#FFFFFF を貼り付け" maxlength="7" inputmode="text" autocapitalize="characters" spellcheck="false">
+                <button class="btn btn-secondary btn-sm" id="si-bg-apply" type="button">適用</button>
+              </div>
+            </details>
           </div>
         </div>
 
