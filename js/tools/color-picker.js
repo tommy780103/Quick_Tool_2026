@@ -30,6 +30,14 @@
   var imgInfo    = document.getElementById('cp-image-info');
   var imgClearBtn = document.getElementById('cp-image-clear');
 
+  // メインカラー & 補色
+  var mainItemEl   = document.getElementById('cp-main-item');
+  var mainSwatchEl = document.getElementById('cp-main-swatch');
+  var mainHexEl    = document.getElementById('cp-main-hex');
+  var compItemEl   = document.getElementById('cp-comp-item');
+  var compSwatchEl = document.getElementById('cp-comp-swatch');
+  var compHexEl    = document.getElementById('cp-comp-hex');
+
   // --- 色変換関数 ---
 
   /**
@@ -106,6 +114,47 @@
     };
   }
 
+  function hue2rgb(p, q, t) {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  }
+
+  /**
+   * HSL値をRGBに変換
+   * @param {number} h - 0-360
+   * @param {number} s - 0-100
+   * @param {number} l - 0-100
+   * @returns {{ r: number, g: number, b: number }}
+   */
+  function hslToRgb(h, s, l) {
+    h /= 360; s /= 100; l /= 100;
+    var r, g, b;
+    if (s === 0) {
+      r = g = b = l;
+    } else {
+      var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      var p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1 / 3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1 / 3);
+    }
+    return {
+      r: Math.round(r * 255),
+      g: Math.round(g * 255),
+      b: Math.round(b * 255)
+    };
+  }
+
+  /** 補色（色相+180°、彩度・明度は保持）のRGBを返す */
+  function complementaryRgb(r, g, b) {
+    var hsl = rgbToHsl(r, g, b);
+    return hslToRgb((hsl.h + 180) % 360, hsl.s, hsl.l);
+  }
+
   // --- 表示更新 ---
 
   /**
@@ -138,6 +187,19 @@
     rVal.textContent = r;
     gVal.textContent = g;
     bVal.textContent = b;
+
+    // メインカラー & 補色
+    if (mainSwatchEl) {
+      mainSwatchEl.style.backgroundColor = hex;
+      mainHexEl.textContent = hex;
+      mainItemEl.dataset.color = hex;
+
+      var comp = complementaryRgb(r, g, b);
+      var compHex = rgbToHex(comp.r, comp.g, comp.b);
+      compSwatchEl.style.backgroundColor = compHex;
+      compHexEl.textContent = compHex;
+      compItemEl.dataset.color = compHex;
+    }
   }
 
   // --- イベント: カラーピッカー ---
@@ -418,6 +480,20 @@
     imgDropEl.style.display = '';
     imgInfo.textContent = '';
   });
+
+  // --- メインカラー & 補色 ---
+
+  if (mainItemEl) {
+    mainItemEl.addEventListener('click', function () {
+      copyToClipboard(mainItemEl.dataset.color);
+    });
+  }
+  if (compItemEl) {
+    compItemEl.addEventListener('click', function () {
+      var rgb = hexToRgb(compItemEl.dataset.color);
+      updateAll(rgb.r, rgb.g, rgb.b);
+    });
+  }
 
   // --- 初期化 ---
 
