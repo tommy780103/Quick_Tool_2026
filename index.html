@@ -119,7 +119,7 @@
         </a>
       </div>
       <div class="sidebar-group">
-        <div class="sidebar-category">便利ツール <span class="sidebar-count">6</span></div>
+        <div class="sidebar-category">便利ツール <span class="sidebar-count">7</span></div>
         <a class="sidebar-item" href="#qr-generate" data-tool="qr-generate">
           <svg class="sidebar-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 5a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm2-.5a.5.5 0 00-.5.5v3a.5.5 0 00.5.5h3a.5.5 0 00.5-.5V5a.5.5 0 00-.5-.5H5zM6 6h1v1H6V6zm-3 6a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-3zm2-.5a.5.5 0 00-.5.5v3a.5.5 0 00.5.5h3a.5.5 0 00.5-.5v-3a.5.5 0 00-.5-.5H5zm1 1.5h1v1H6v-1zM12 3a2 2 0 00-2 2v3a2 2 0 002 2h3a2 2 0 002-2V5a2 2 0 00-2-2h-3zm-.5 2a.5.5 0 01.5-.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5h-3a.5.5 0 01-.5-.5V5zm1.5 1h1v1h-1V6zm-2 6.5a.5.5 0 01.5-.5h1a.5.5 0 010 1h-1a.5.5 0 01-.5-.5zm4 0a.5.5 0 01.5-.5h1.5v1.5a.5.5 0 01-1 0V13h-.5a.5.5 0 01-.5-.5zM11 15a1 1 0 011-1h1v1a1 1 0 01-1 1h-1v1h2.5a.5.5 0 010 1H11v-3zm5-1h1a1 1 0 011 1v2a1 1 0 01-1 1h-1a1 1 0 01-1-1v-2a1 1 0 011-1z"/></svg>
           QRコード生成
@@ -143,6 +143,10 @@
         <a class="sidebar-item" href="#era-convert" data-tool="era-convert">
           <svg class="sidebar-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M7.5 3.5a.75.75 0 00-1.06 0l-3 3a.75.75 0 000 1.06l3 3a.75.75 0 101.06-1.06L5.81 7.75H14a.75.75 0 000-1.5H5.81l1.69-1.69a.75.75 0 000-1.06zm5 6a.75.75 0 011.06 0l3 3a.75.75 0 010 1.06l-3 3a.75.75 0 11-1.06-1.06l1.69-1.69H6a.75.75 0 010-1.5h8.19l-1.69-1.69a.75.75 0 010-1.06z"/></svg>
           西暦和暦変換
+        </a>
+        <a class="sidebar-item" href="#compound-interest" data-tool="compound-interest">
+          <svg class="sidebar-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1a9 9 0 100 18 9 9 0 000-18zM8.7 14.6v1.05a.65.65 0 001.3 0v-1.02c1.3-.18 2.3-.95 2.3-2.2 0-1.3-.95-1.92-2.46-2.3-1.16-.3-1.5-.6-1.5-1.07 0-.5.46-.86 1.2-.86.78 0 1.07.37 1.1.92a.6.6 0 00.6.55h.1a.59.59 0 00.59-.68c-.12-.96-.74-1.6-1.73-1.8V6.4a.65.65 0 00-1.3 0v1.05c-1.2.26-2.05 1.02-2.05 2.12 0 1.3 1.08 1.94 2.65 2.32 1.4.34 1.68.83 1.68 1.34 0 .38-.27.98-1.36.98-1.02 0-1.42-.46-1.48-1.04a.6.6 0 00-.6-.54h-.09a.59.59 0 00-.59.66c.13 1 .9 1.6 1.82 1.81z"/></svg>
+          複利計算
         </a>
       </div>
       <div class="sidebar-footer">
@@ -284,6 +288,10 @@
               <a class="home-card" href="#era-convert" data-tool="era-convert">
                 <div class="home-card-title">西暦和暦変換</div>
                 <div class="home-card-desc">西暦と和暦（元号）を相互変換</div>
+              </a>
+              <a class="home-card" href="#compound-interest" data-tool="compound-interest">
+                <div class="home-card-title">複利計算</div>
+                <div class="home-card-desc">積立・複利での資産シミュレーション</div>
               </a>
             </div>
           </div>
@@ -1450,6 +1458,99 @@
         </div>
       </section>
 
+      <!-- 複利計算 -->
+      <section class="tool-panel" id="tool-compound-interest">
+        <div class="tool-header">
+          <h2 class="tool-title" tabindex="-1">複利計算</h2>
+          <p class="tool-description">元本・積立・利率から、複利運用後の資産額をシミュレーションします。</p>
+        </div>
+
+        <div class="ci-layout">
+          <!-- 入力 -->
+          <div class="ci-card ci-inputs">
+            <div class="setting-row">
+              <label class="setting-label" for="ci-principal">元本（初期投資額）</label>
+              <div class="ci-input-unit">
+                <input type="number" class="setting-input" id="ci-principal" value="1000000" min="0" step="10000" inputmode="numeric">
+                <span class="ci-unit">円</span>
+              </div>
+            </div>
+            <div class="setting-row">
+              <label class="setting-label" for="ci-contribution">積立額（毎回）</label>
+              <div class="ci-input-unit">
+                <input type="number" class="setting-input" id="ci-contribution" value="30000" min="0" step="1000" inputmode="numeric">
+                <span class="ci-unit">円</span>
+              </div>
+            </div>
+            <div class="setting-row">
+              <label class="setting-label" for="ci-rate">年利率</label>
+              <div class="ci-input-unit">
+                <input type="number" class="setting-input" id="ci-rate" value="5" min="0" max="100" step="0.1" inputmode="decimal">
+                <span class="ci-unit">%</span>
+              </div>
+            </div>
+            <div class="setting-row">
+              <label class="setting-label" for="ci-years">運用期間</label>
+              <div class="ci-input-unit">
+                <input type="number" class="setting-input" id="ci-years" value="20" min="1" max="100" step="1" inputmode="numeric">
+                <span class="ci-unit">年</span>
+              </div>
+            </div>
+            <div class="setting-row">
+              <label class="setting-label" for="ci-frequency">複利・積立の頻度</label>
+              <select class="setting-input" id="ci-frequency">
+                <option value="12">毎月</option>
+                <option value="4">四半期（3ヶ月）ごと</option>
+                <option value="2">半年ごと</option>
+                <option value="1">年1回</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <label class="setting-label">積立のタイミング</label>
+              <div class="ci-radio-row">
+                <label><input type="radio" name="ci-timing" value="end" checked> 期末</label>
+                <label><input type="radio" name="ci-timing" value="begin"> 期初</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 結果サマリー -->
+          <div class="ci-card ci-summary">
+            <div class="ci-summary-main">
+              <span class="ci-summary-label">最終資産額</span>
+              <span class="ci-summary-value" id="ci-total">--</span>
+            </div>
+            <div class="ci-summary-breakdown">
+              <div class="ci-summary-item">
+                <span class="ci-dot ci-dot-principal"></span>
+                <span class="ci-bd-label">元本＋積立合計</span>
+                <span class="ci-bd-value" id="ci-invested">--</span>
+              </div>
+              <div class="ci-summary-item">
+                <span class="ci-dot ci-dot-interest"></span>
+                <span class="ci-bd-label">運用益（利息）</span>
+                <span class="ci-bd-value" id="ci-interest">--</span>
+              </div>
+            </div>
+            <div class="ci-bar" id="ci-bar" aria-hidden="true">
+              <div class="ci-bar-principal" id="ci-bar-principal"></div>
+              <div class="ci-bar-interest" id="ci-bar-interest"></div>
+            </div>
+            <p class="ci-note">※ 税金・手数料は考慮していません。年利一定と仮定した概算です。</p>
+          </div>
+        </div>
+
+        <!-- 年次推移 -->
+        <div class="ci-card">
+          <div class="ci-card-head">
+            <span class="ci-card-title">年次推移</span>
+          </div>
+          <div class="ci-table-wrap">
+            <table class="ci-table" id="ci-table"></table>
+          </div>
+        </div>
+      </section>
+
     </main>
   </div>
 
@@ -1491,5 +1592,6 @@
   <script src="js/tools/color-picker.js"></script>
   <script src="js/tools/calendar.js"></script>
   <script src="js/tools/era-convert.js"></script>
+  <script src="js/tools/compound-interest.js"></script>
 </body>
 </html>

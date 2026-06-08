@@ -2082,3 +2082,226 @@
     min-width: 72px;
   }
 }
+
+/* ============================================
+   複利計算 (compound-interest)
+   ============================================ */
+
+.ci-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.ci-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-4);
+}
+
+.ci-layout .ci-card {
+  margin-bottom: 0;
+}
+
+.ci-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ci-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* 入力欄＋単位 */
+.ci-input-unit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ci-input-unit .setting-input {
+  flex: 1;
+  text-align: right;
+}
+
+.ci-unit {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  min-width: 24px;
+}
+
+.ci-radio-row {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.ci-radio-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* 結果サマリー */
+.ci-summary {
+  display: flex;
+  flex-direction: column;
+}
+
+.ci-summary-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ci-summary-label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.ci-summary-value {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1.2;
+}
+
+.ci-summary-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.ci-summary-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.ci-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.ci-dot-principal { background: var(--color-primary); }
+.ci-dot-interest  { background: var(--color-success); }
+
+.ci-bd-label {
+  color: var(--color-text-secondary);
+}
+
+.ci-bd-value {
+  margin-left: auto;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* 内訳バー */
+.ci-bar {
+  display: flex;
+  height: 14px;
+  border-radius: 7px;
+  overflow: hidden;
+  margin-top: 16px;
+  background: var(--color-bg);
+}
+
+.ci-bar-principal {
+  background: var(--color-primary);
+  transition: width var(--transition);
+}
+
+.ci-bar-interest {
+  background: var(--color-success);
+  transition: width var(--transition);
+}
+
+.ci-note {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin-top: 14px;
+  line-height: 1.6;
+}
+
+/* 年次推移テーブル */
+.ci-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.ci-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.ci-table th,
+.ci-table td {
+  text-align: right;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ci-table th:first-child,
+.ci-table td:first-child {
+  text-align: left;
+}
+
+.ci-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  font-size: 12px;
+  z-index: 1;
+}
+
+.ci-table tbody tr:hover {
+  background: var(--color-surface-hover);
+}
+
+.ci-table .ci-td-year {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.ci-table .ci-td-balance {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.ci-table .ci-td-gain {
+  color: var(--color-success);
+}
+
+@media (max-width: 768px) {
+  .ci-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .ci-summary-value {
+    font-size: 26px;
+  }
+}
