@@ -123,7 +123,11 @@
         </a>
       </div>
       <div class="sidebar-group">
-        <div class="sidebar-category">便利ツール <span class="sidebar-count">7</span></div>
+        <div class="sidebar-category">便利ツール <span class="sidebar-count">8</span></div>
+        <a class="sidebar-item" href="#timer" data-tool="timer">
+          <svg class="sidebar-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M8 1.5A.75.75 0 018.75.75h2.5a.75.75 0 010 1.5h-.5v1.06a6.5 6.5 0 013.34 1.38l.76-.76a.75.75 0 011.06 1.06l-.76.76A6.5 6.5 0 1110.75 3.81V2.25h-.5A.75.75 0 018 1.5zm2 5a4.5 4.5 0 100 9 4.5 4.5 0 000-9zm.75 2.25a.75.75 0 00-1.5 0V11a.75.75 0 00.22.53l1.5 1.5a.75.75 0 101.06-1.06l-1.28-1.28V8.75z"/></svg>
+          タイマー
+        </a>
         <a class="sidebar-item" href="#qr-generate" data-tool="qr-generate">
           <svg class="sidebar-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 5a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm2-.5a.5.5 0 00-.5.5v3a.5.5 0 00.5.5h3a.5.5 0 00.5-.5V5a.5.5 0 00-.5-.5H5zM6 6h1v1H6V6zm-3 6a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-3zm2-.5a.5.5 0 00-.5.5v3a.5.5 0 00.5.5h3a.5.5 0 00.5-.5v-3a.5.5 0 00-.5-.5H5zm1 1.5h1v1H6v-1zM12 3a2 2 0 00-2 2v3a2 2 0 002 2h3a2 2 0 002-2V5a2 2 0 00-2-2h-3zm-.5 2a.5.5 0 01.5-.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5h-3a.5.5 0 01-.5-.5V5zm1.5 1h1v1h-1V6zm-2 6.5a.5.5 0 01.5-.5h1a.5.5 0 010 1h-1a.5.5 0 01-.5-.5zm4 0a.5.5 0 01.5-.5h1.5v1.5a.5.5 0 01-1 0V13h-.5a.5.5 0 01-.5-.5zM11 15a1 1 0 011-1h1v1a1 1 0 01-1 1h-1v1h2.5a.5.5 0 010 1H11v-3zm5-1h1a1 1 0 011 1v2a1 1 0 01-1 1h-1a1 1 0 01-1-1v-2a1 1 0 011-1z"/></svg>
           QRコード生成
@@ -273,6 +277,10 @@
               便利ツール
             </h3>
             <div class="home-cards">
+              <a class="home-card" href="#timer" data-tool="timer">
+                <div class="home-card-title">タイマー</div>
+                <div class="home-card-desc">カウントダウン・ストップウォッチ・ポモドーロ・発表</div>
+              </a>
               <a class="home-card" href="#qr-generate" data-tool="qr-generate">
                 <div class="home-card-title">QRコード生成</div>
                 <div class="home-card-desc">テキスト・URLからQRコード作成</div>
@@ -1664,6 +1672,128 @@
         </div>
       </section>
 
+      <!-- タイマー -->
+      <section class="tool-panel" id="tool-timer">
+        <div class="tool-header">
+          <h2 class="tool-title" tabindex="-1">タイマー</h2>
+          <p class="tool-description">カウントダウン・ストップウォッチ・ポモドーロ・発表タイマーの4種類。完了時に音とブラウザ通知でお知らせします。</p>
+        </div>
+
+        <div class="tm-tabs" role="tablist">
+          <button class="tm-tab active" type="button" role="tab" aria-selected="true" data-tm-tab="countdown">カウントダウン</button>
+          <button class="tm-tab" type="button" role="tab" aria-selected="false" data-tm-tab="stopwatch">ストップウォッチ</button>
+          <button class="tm-tab" type="button" role="tab" aria-selected="false" data-tm-tab="pomodoro">ポモドーロ</button>
+          <button class="tm-tab" type="button" role="tab" aria-selected="false" data-tm-tab="presentation">発表タイマー</button>
+        </div>
+
+        <div class="tm-options">
+          <label class="tm-opt"><input type="checkbox" id="tm-sound" checked> 完了音を鳴らす</label>
+          <label class="tm-opt"><input type="checkbox" id="tm-notify"> ブラウザ通知</label>
+        </div>
+
+        <!-- カウントダウン -->
+        <div class="tm-pane active" data-tm-pane="countdown">
+          <div class="tm-stage">
+            <div class="tm-ring-wrap" id="cd-wrap">
+              <svg class="tm-ring" viewBox="0 0 280 280" aria-hidden="true">
+                <circle class="tm-ring-bg" cx="140" cy="140" r="130"></circle>
+                <circle class="tm-ring-fg" id="cd-ring" cx="140" cy="140" r="130"></circle>
+              </svg>
+              <div class="tm-ring-center">
+                <div class="tm-display" id="cd-display">05:00</div>
+                <div class="tm-sub" id="cd-status">準備完了</div>
+              </div>
+            </div>
+          </div>
+          <div class="tm-time-inputs">
+            <div class="tm-ti"><input type="number" id="cd-h" min="0" max="99" value="0" inputmode="numeric"><span>時</span></div>
+            <div class="tm-ti"><input type="number" id="cd-m" min="0" max="59" value="5" inputmode="numeric"><span>分</span></div>
+            <div class="tm-ti"><input type="number" id="cd-s" min="0" max="59" value="0" inputmode="numeric"><span>秒</span></div>
+          </div>
+          <div class="tm-presets" id="cd-presets">
+            <button type="button" data-min="1">1分</button>
+            <button type="button" data-min="3">3分</button>
+            <button type="button" data-min="5">5分</button>
+            <button type="button" data-min="10">10分</button>
+            <button type="button" data-min="15">15分</button>
+            <button type="button" data-min="25">25分</button>
+            <button type="button" data-min="30">30分</button>
+            <button type="button" data-min="60">60分</button>
+          </div>
+          <div class="tm-controls">
+            <button class="btn btn-primary tm-btn-lg" id="cd-start" type="button">スタート</button>
+            <button class="btn btn-secondary tm-btn-lg" id="cd-reset" type="button">リセット</button>
+          </div>
+        </div>
+
+        <!-- ストップウォッチ -->
+        <div class="tm-pane" data-tm-pane="stopwatch">
+          <div class="tm-stage">
+            <div class="tm-display tm-display-sw" id="sw-display">00:00.00</div>
+          </div>
+          <div class="tm-controls">
+            <button class="btn btn-primary tm-btn-lg" id="sw-start" type="button">スタート</button>
+            <button class="btn btn-secondary tm-btn-lg" id="sw-lap" type="button" disabled>ラップ</button>
+            <button class="btn btn-secondary tm-btn-lg" id="sw-reset" type="button">リセット</button>
+          </div>
+          <div class="tm-laps" id="sw-laps"></div>
+        </div>
+
+        <!-- ポモドーロ -->
+        <div class="tm-pane" data-tm-pane="pomodoro">
+          <div class="tm-stage">
+            <div class="tm-ring-wrap" id="pm-wrap">
+              <svg class="tm-ring" viewBox="0 0 280 280" aria-hidden="true">
+                <circle class="tm-ring-bg" cx="140" cy="140" r="130"></circle>
+                <circle class="tm-ring-fg" id="pm-ring" cx="140" cy="140" r="130"></circle>
+              </svg>
+              <div class="tm-ring-center">
+                <div class="tm-phase is-work" id="pm-phase">🍅 作業</div>
+                <div class="tm-display" id="pm-display">25:00</div>
+                <div class="tm-sub" id="pm-count">🍅 ×0</div>
+              </div>
+            </div>
+          </div>
+          <div class="tm-pomo-settings">
+            <label class="tm-set">作業（分）<input type="number" id="pm-work" min="1" max="180" value="25" inputmode="numeric"></label>
+            <label class="tm-set">短い休憩（分）<input type="number" id="pm-short" min="1" max="60" value="5" inputmode="numeric"></label>
+            <label class="tm-set">長い休憩（分）<input type="number" id="pm-long" min="1" max="60" value="15" inputmode="numeric"></label>
+            <label class="tm-set">長休憩まで（セット）<input type="number" id="pm-sessions" min="1" max="12" value="4" inputmode="numeric"></label>
+            <label class="tm-set tm-set-check"><input type="checkbox" id="pm-auto" checked> 自動で次へ</label>
+          </div>
+          <div class="tm-controls">
+            <button class="btn btn-primary tm-btn-lg" id="pm-start" type="button">スタート</button>
+            <button class="btn btn-secondary tm-btn-lg" id="pm-skip" type="button">スキップ</button>
+            <button class="btn btn-secondary tm-btn-lg" id="pm-reset" type="button">リセット</button>
+          </div>
+        </div>
+
+        <!-- 発表タイマー -->
+        <div class="tm-pane" data-tm-pane="presentation">
+          <div class="tm-stage">
+            <div class="tm-ring-wrap" id="pr-wrap">
+              <svg class="tm-ring" viewBox="0 0 280 280" aria-hidden="true">
+                <circle class="tm-ring-bg" cx="140" cy="140" r="130"></circle>
+                <circle class="tm-ring-fg" id="pr-ring" cx="140" cy="140" r="130"></circle>
+              </svg>
+              <div class="tm-ring-center">
+                <div class="tm-display" id="pr-display">00:00</div>
+                <div class="tm-sub" id="pr-remain">残り 07:00</div>
+              </div>
+            </div>
+          </div>
+          <div class="tm-bells">
+            <div class="tm-bell"><span class="tm-bell-dot" id="pr-bell1-dot"></span>1鈴 <input type="number" id="pr-b1" min="0" max="180" step="0.5" value="6" inputmode="decimal"><span>分</span></div>
+            <div class="tm-bell"><span class="tm-bell-dot" id="pr-bell2-dot"></span>2鈴 <input type="number" id="pr-b2" min="0" max="180" step="0.5" value="7" inputmode="decimal"><span>分</span></div>
+            <div class="tm-bell"><span class="tm-bell-dot" id="pr-bell3-dot"></span>3鈴 <input type="number" id="pr-b3" min="0" max="180" step="0.5" value="8" inputmode="decimal"><span>分</span></div>
+          </div>
+          <div class="tm-controls">
+            <button class="btn btn-primary tm-btn-lg" id="pr-start" type="button">スタート</button>
+            <button class="btn btn-secondary tm-btn-lg" id="pr-reset" type="button">リセット</button>
+          </div>
+        </div>
+      </section>
+
     </main>
   </div>
 
@@ -1707,5 +1837,6 @@
   <script src="js/tools/calendar.js"></script>
   <script src="js/tools/era-convert.js"></script>
   <script src="js/tools/compound-interest.js"></script>
+  <script src="js/tools/timer.js"></script>
 </body>
 </html>
