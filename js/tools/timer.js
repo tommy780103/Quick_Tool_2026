@@ -189,8 +189,8 @@
       switch (order[i]) {
         case 'countdown': if (cd.running) label = fmtClockCeil(cdRemaining()); break;
         case 'stopwatch': if (sw.running) label = fmtClock(swElapsed()); break;
-        case 'pomodoro': if (pm.running) label = pm.phaseIcon + ' ' + fmtClockCeil(pmRemaining()); break;
-        case 'presentation': if (pr.running) label = '🎤 ' + fmtClock(prElapsed()); break;
+        case 'pomodoro': if (pm.running) label = pm.phaseShort + ' ' + fmtClockCeil(pmRemaining()); break;
+        case 'presentation': if (pr.running) label = '発表 ' + fmtClock(prElapsed()); break;
       }
     }
     document.title = label ? '⏱ ' + label + ' — ' + baseTitle : baseTitle;
@@ -389,9 +389,14 @@
   //  3. ポモドーロ
   // ============================================
   var pm = {
-    phase: 'work', phaseIcon: '🍅', worksDone: 0, totalPomos: 0,
+    phase: 'work', phaseShort: '作業', worksDone: 0, totalPomos: 0,
     remainingMs: 25 * 60000, endTs: 0, running: false
   };
+
+  // 局面アイコン（SVG。絵文字は使わない）
+  var IC_TOMATO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8c-3.3 0-6 2.4-6 6.2C6 18 8.7 21 12 21s6-3 6-6.8C18 10.4 15.3 8 12 8Z"/><path d="M12 8V5.5M12 8C11 6.4 8.8 6.2 8.8 6.2M12 8c1-1.6 3.2-1.8 3.2-1.8"/></svg>';
+  var IC_COFFEE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V8Z"/><path d="M16 9h2.2a2.3 2.3 0 0 1 0 4.6H16"/><path d="M8 2.5v2M11.5 2.5v2"/></svg>';
+  var IC_LEAF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20c0-8 6-14 16-14 0 10-6 14-16 14Z"/><path d="M4.5 19.5C8 14 12 11.5 16 10.5"/></svg>';
   var pmPhaseEl = $('pm-phase');
   var pmDisplay = $('pm-display');
   var pmCount = $('pm-count');
@@ -404,9 +409,9 @@
   var pmWrap = $('pm-wrap');
 
   var PM_META = {
-    work: { label: '作業', icon: '🍅', cls: 'is-work' },
-    short: { label: '休憩', icon: '☕', cls: 'is-break' },
-    long: { label: '長い休憩', icon: '🌿', cls: 'is-long' }
+    work: { label: '作業', icon: IC_TOMATO, cls: 'is-work' },
+    short: { label: '休憩', icon: IC_COFFEE, cls: 'is-break' },
+    long: { label: '長い休憩', icon: IC_LEAF, cls: 'is-long' }
   };
 
   function pmPhaseMs(phase) {
@@ -421,9 +426,9 @@
 
   function pmApplyPhase(phase) {
     pm.phase = phase;
-    pm.phaseIcon = PM_META[phase].icon;
+    pm.phaseShort = PM_META[phase].label;
     pm.remainingMs = pmPhaseMs(phase);
-    pmPhaseEl.textContent = PM_META[phase].icon + ' ' + PM_META[phase].label;
+    pmPhaseEl.innerHTML = PM_META[phase].icon + '<span>' + PM_META[phase].label + '</span>';
     pmPhaseEl.className = 'tm-phase ' + PM_META[phase].cls;
   }
 
@@ -432,8 +437,9 @@
     var total = pmPhaseMs(pm.phase);
     pmDisplay.textContent = fmtClockCeil(rem);
     setRing(pmRing, total > 0 ? rem / total : 0);
-    pmCount.textContent = '🍅 ×' + pm.totalPomos;
-    pmRing.classList.toggle('is-break', pm.phase !== 'work');
+    pmCount.innerHTML = IC_TOMATO + '×' + pm.totalPomos;
+    pmRing.classList.remove('is-work', 'is-break', 'is-long');
+    pmRing.classList.add(PM_META[pm.phase].cls);
   }
 
   function startPm() {
