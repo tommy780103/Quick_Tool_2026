@@ -268,6 +268,51 @@
     });
   }
 
+  // --- イベント：結果クリックでクリップボードにコピー ---
+
+  function copyText(text) {
+    var ok = function () {
+      if (window.ChoiTool) ChoiTool.showToast('コピーしました', 'success');
+      elResult.classList.add('calc-copied');
+      setTimeout(function () { elResult.classList.remove('calc-copied'); }, 600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(ok, function () { fallbackCopy(text, ok); });
+    } else {
+      fallbackCopy(text, ok);
+    }
+  }
+
+  function fallbackCopy(text, ok) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      ok();
+    } catch (e) {
+      if (window.ChoiTool) ChoiTool.showToast('コピーに失敗しました', 'error');
+    }
+  }
+
+  function copyResult() {
+    if (errored || current === 'エラー') return;
+    copyText(current); // 3桁区切りを除いた生の数値をコピー
+  }
+
+  elResult.addEventListener('click', copyResult);
+  elResult.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation(); // documentの「=」処理に伝播させない
+      copyResult();
+    }
+  });
+
   // --- イベント：キーボード操作 ---
 
   document.addEventListener('keydown', function (e) {

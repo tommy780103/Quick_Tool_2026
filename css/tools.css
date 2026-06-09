@@ -3043,6 +3043,22 @@
   word-break: break-all;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.5px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 2px 4px;
+  margin: -2px -4px;
+  transition: background var(--transition), color var(--transition);
+}
+
+.calc-result:hover { background: rgba(255, 255, 255, 0.08); }
+.calc-result:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+/* コピー時のフラッシュ */
+.calc-result.calc-copied {
+  color: #7ee2a8;
 }
 
 /* キーパッド */

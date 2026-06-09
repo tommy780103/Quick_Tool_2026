@@ -17,6 +17,7 @@
 - イミディエイト実行方式（例：`2 × 3 + 4` は左から逐次計算し 10）。
 - ％の挙動：演算子が保留中なら基準値に対する割合（`200 + 10% = 220`）、単独なら `÷100`（`50% = 0.5`）。
 - 計算履歴：`=` ごとに上に積み上げ（最大20件）。項目クリックでその結果を現在値に復元。「クリア」で履歴消去。
+- 結果表示部をクリック（または Enter/Space）でクリップボードにコピー。3桁区切りを除いた生の数値（例：`1234.5`）をコピーし、トースト通知＋一瞬色をフラッシュ。エラー時はコピー不可。
 - 3桁区切り表示・末尾の余分な0除去・浮動小数誤差の丸め（`0.1 + 0.2 = 0.3`）。
 - 桁あふれ（`1e15` 以上 / `1e-10` 未満）は指数表記。ゼロ除算は「エラー」表示し、次の入力で自動リセット。
 
@@ -34,6 +35,7 @@
 - 状態：`current`(入力中の文字列) / `previous`(オペランド) / `operator` / `waitingForOperand` / `justEvaluated` / `errored`。
 - `keydown` は `document` に1つだけ登録し、`panel.classList.contains('active')` で電卓表示中のみ反応（他ツールのキー入力を奪わない）。
 - `groupDisplay()` は符号・小数・末尾ドットを保持したまま整数部のみ3桁区切り。`formatResult()` は `toPrecision(12)` で誤差丸め。
+- コピーは `navigator.clipboard.writeText`、非対応環境は `textarea + execCommand('copy')` にフォールバック。トーストは共通の `ChoiTool.showToast`（`common.js`、calculator.js より先に読み込み済み）。結果は `role="button" tabindex="0"` でキーボード操作可。Enter/Space は `stopPropagation()` で document の「=」処理に伝播させない。
 
 ## 検証（Nodeでコアロジック確認済み）
 - `7 + 8 = 15` ／ `2 × 3 + 4 = 10`（連続演算）
